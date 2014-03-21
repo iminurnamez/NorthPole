@@ -32,15 +32,22 @@ class Race(object):
         self.player = player
         self.racing = True
         self.dist_travelled = 0
-        self.track_rect = pg.Rect(0, self.screen_rect.bottom - 380, self.screen_rect.width, 400)
-        self.grass_rect = pg.Rect(0, self.track_rect.top - 100, self.screen_rect.width, 100)
-        self.sky_rect = pg.Rect(0, 0, self.screen_rect.width, self.grass_rect.top)
-        self.fences  = [Fence((x * 32, self.track_rect.top - 12)) for x in range(int((self.distance/32) + 10))]
-        self.clouds = [Cloud((randint(10, self.distance), randint(0, 150))) for i in range(int(self.distance/350))] 
-        self.finish_rect = pg.Rect(self.distance, self.track_rect.top, 5, self.track_rect.height)
+        self.track_rect = pg.Rect(0, self.screen_rect.bottom - 380,
+                                             self.screen_rect.width, 400)
+        self.grass_rect = pg.Rect(0, self.track_rect.top - 100,
+                                              self.screen_rect.width, 100)
+        self.sky_rect = pg.Rect(0, 0, self.screen_rect.width,
+                                           self.grass_rect.top)
+        self.fences  = [Fence((x * 32, self.track_rect.top - 12)) for
+                              x in range(int((self.distance/32) + 10))]
+        self.clouds = [Cloud((randint(10, self.distance), randint(0, 150))) for
+                             i in range(int(self.distance/350))] 
+        self.finish_rect = pg.Rect(self.distance, self.track_rect.top, 5,
+        self.track_rect.height)
         self.map_scale = int(self.distance / (self.screen_rect.width - 300))
         self.map_rect = pg.Rect(270, 20, self.distance / self.map_scale, 100)
-        self.mapline_rect = pg.Rect(self.map_rect.left + int(self.finish_rect.left / self.map_scale),
+        self.mapline_rect = pg.Rect(self.map_rect.left + 
+                                                  int(self.finish_rect.left / self.map_scale),
                                                   self.map_rect.top, 2, self.map_rect.height)
         for racer in self.racers:
             racer.rect.centery += self.track_rect.top
@@ -56,7 +63,8 @@ class Race(object):
                     racer.energy -= .02
                 if racer.energy < 1:
                     racer.energy = 1
-                movement = (randint(1, 1500) + (racer.speed * (racer.energy /100.0))) / 200.0
+                movement = (randint(1, 1500) + 
+                                     (racer.speed * racer.energy * .01)) / 200.0
                 if not self.ticks % int((10 - int(movement))/2):
                     racer.image = next(racer.images)
                     racer.surface.fill(pg.Color("black"))

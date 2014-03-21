@@ -57,7 +57,7 @@ class LeftGate(Obstacle):
     def update(self, boarder):
         if not self.passed: 
             if self.collision_rect.top <= boarder.rect.centery <= self.rect.bottom:
-                if boarder.rect.centerx < self.collision_rect.left:
+                if self.rect.left - 150 <= boarder.rect.centerx <= self.collision_rect.left:
                     self.image = self.passed_image
                     self.sound.play()
                 self.passed = True
@@ -77,7 +77,7 @@ class RightGate(Obstacle):
     def update(self, boarder):
         if not self.passed: 
             if self.collision_rect.top <= boarder.rect.centery <= self.rect.bottom:
-                if boarder.rect.centerx > self.collision_rect.right:
+                if self.collision_rect.right + 150 >= boarder.rect.centerx >= self.collision_rect.right:
                     self.image = self.passed_image
                     self.sound.play()
                 self.passed = True

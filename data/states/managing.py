@@ -1,3 +1,4 @@
+import sys
 import random
 import pygame as pg
 from .. import tools
@@ -9,7 +10,7 @@ class Managing(tools._State):
     def __init__(self):
         super(Managing, self).__init__()
         self.next = None
-        self.max_fps = 80 #for testing, should be 40
+        self.max_fps = 80 #for testing, should be lower
         self.fps = 20
         self.world = worlds.World(1600, 1008, 16, 16)
 
@@ -52,21 +53,6 @@ class Managing(tools._State):
         elf33a = elves.Elf((45, 30), self.world)
         elf44a = elves.Elf((6, 30), self.world)
         elf55a = elves.Elf((5, 30), self.world)
-        elf1.home = elf_house
-        elf2.home = elf_house2
-        elf3.home = elf_house
-        elf4.home = elf_house2
-        elf5.home = elf_house2
-        elf10.home = elf_house
-        elf20.home = elf_house2
-        elf30.home = elf_house
-        elf40.home = elf_house2
-        elf50.home = elf_house2
-        elf11.home = elf_house2
-        elf22.home = elf_house
-        elf33.home = elf_house2
-        elf44.home = elf_house
-        elf55.home = ghouse
         elf1.job = farm1
         elf2.job = farm1
         elf3.job = farm2
@@ -79,24 +65,9 @@ class Managing(tools._State):
         elf50.job = warehouse1
         elf11.job = farm2
         elf22.job = farm2
-        elf33.job = farm1
+        elf33.job = warehouse1
         elf44.job = barn1
         elf55.job = woodshed
-        elf1a.home = elf_house
-        elf2a.home = elf_house2
-        elf3a.home = elf_house
-        elf4a.home = elf_house2
-        elf5a.home = elf_house2
-        elf10a.home = elf_house
-        elf20a.home = elf_house2
-        elf30a.home = elf_house
-        elf40a.home = elf_house2
-        elf50a.home = elf_house2
-        elf11a.home = elf_house2
-        elf22a.home = elf_house
-        elf33a.home = elf_house2
-        elf44a.home = elf_house
-        elf55a.home = ghouse
         elf1a.job = farm1
         elf2a.job = farm1
         elf3a.job = farm2
@@ -107,8 +78,8 @@ class Managing(tools._State):
         elf30a.job = farm2
         elf40a.job = barn1
         elf50a.job = warehouse1
-        elf11a.job = farm2
-        elf22a.job = farm2
+        elf11a.job = warehouse1
+        elf22a.job = warehouse1
         elf33a.job = farm1
         elf44a.job = barn1
         elf55a.job = woodshed
@@ -142,64 +113,34 @@ class Managing(tools._State):
         aelf33a = elves.Elf((45, 31), self.world)
         aelf44a = elves.Elf((6, 31), self.world)
         aelf55a = elves.Elf((5, 31), self.world)
-        aelf1.home = elf_house
-        aelf2.home = elf_house2
-        aelf3.home = elf_house
-        aelf4.home = elf_house2
-        aelf5.home = elf_house2
-        aelf10.home = elf_house
-        aelf20.home = elf_house2
-        aelf30.home = elf_house
-        aelf40.home = elf_house2
-        aelf50.home = elf_house2
-        aelf11.home = elf_house2
-        aelf22.home = elf_house
-        aelf33.home = elf_house2
-        aelf44.home = elf_house
-        aelf55.home = ghouse
         aelf1.job = farm1
         aelf2.job = farm1
         aelf3.job = farm2
         aelf4.job = barn1
         aelf5.job = warehouse1
-        aelf10.job = farm1
-        aelf20.job = farm1
+        aelf10.job = warehouse1
+        aelf20.job = warehouse1
         aelf30.job = farm2
         aelf40.job = barn1
         aelf50.job = warehouse1
-        aelf11.job = farm2
-        aelf22.job = farm2
-        aelf33.job = farm1
+        aelf11.job = warehouse1
+        aelf22.job = warehouse1
+        aelf33.job = warehouse1
         aelf44.job = barn1
         aelf55.job = woodshed
-        aelf1a.home = elf_house
-        aelf2a.home = elf_house2
-        aelf3a.home = elf_house
-        aelf4a.home = elf_house2
-        aelf5a.home = elf_house2
-        aelf10a.home = elf_house
-        aelf20a.home = elf_house2
-        aelf30a.home = elf_house
-        aelf40a.home = elf_house2
-        aelf50a.home = elf_house2
-        aelf11a.home = elf_house2
-        aelf22a.home = elf_house
-        aelf33a.home = elf_house2
-        aelf44a.home = elf_house
-        aelf55a.home = ghouse
-        aelf1a.job = farm1
-        aelf2a.job = farm1
-        aelf3a.job = farm2
+        aelf1a.job = warehouse1
+        aelf2a.job = warehouse1
+        aelf3a.job = warehouse1
         aelf4a.job = barn1
         aelf5a.job = warehouse1
-        aelf10a.job = farm1
-        aelf20a.job = farm1
-        aelf30a.job = farm2
+        aelf10a.job = warehouse1
+        aelf20a.job = warehouse1
+        aelf30a.job = warehouse1
         aelf40a.job = barn1
         aelf50a.job = warehouse1
-        aelf11a.job = farm2
-        aelf22a.job = farm2
-        aelf33a.job = farm1
+        aelf11a.job = warehouse1
+        aelf22a.job = warehouse1
+        aelf33a.job = warehouse1
         aelf44a.job = barn1
         aelf55a.job = woodshed
         self.world.elves = [elf1, elf2, elf3, elf4, elf5, elf11, elf22, elf33,
@@ -216,16 +157,20 @@ class Managing(tools._State):
         theater = buildings.Theater((42, 10), self.world)
         ctree = decorations.XmasTree((27, 18), self.world)
         pyrobox = decorations.PyroBox((10, 20), self.world)
+        wavysanta = decorations.WavySanta((54, 30), self.world)
         rink = buildings.SkatingRink((38, 35), self.world)
         snackbar = buildings.SnackBar((34, 40), self.world)
         self.world.trees = [buildings.Tree((10, 10), self.world),
                                     buildings.Tree((12, 12), self.world),
-                                    buildings.Tree((14, 45), self.world),
-                                    buildings.Tree((45, 8), self.world),
-                                    buildings.Tree((44, 30), self.world)]
+                                    buildings.Tree((14, 42), self.world),
+                                    buildings.Tree((45, 5), self.world),
+                                    buildings.Tree((44, 30), self.world),
+                                    buildings.Tree((20, 4), self.world),
+                                    buildings.Tree((25, 6), self.world),
+                                    buildings.Tree((30, 3), self.world)]
         self.world.buildings = [farm1, farm2, elf_house, elf_house2, fort,
-                                          barn1, warehouse1, theater, rink, woodshed,
-                                          snackbar, ghouse]
+                                          barn1, warehouse1, theater, rink,
+                                          woodshed, snackbar, ghouse]
         self.world.food_buildings.append(snackbar)
         self.world.cheer_buildings.append(fort)
         self.world.cheer_buildings.append(theater)
@@ -234,18 +179,23 @@ class Managing(tools._State):
         self.world.rest_buildings.append(ghouse)
         self.world.decorations.append(ctree)
         self.world.decorations.append(pyrobox)
+        self.world.decorations.append(wavysanta)
         self.world.cheer_buildings.append(rink)
         # END OF TEST VALUES
        
     def get_event(self, event):
         if event.type == pg.QUIT:
             pg.quit()
+            sys.exit()
         elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_s:
+            if event.key == pg.K_ESCAPE:
+                pg.quit()
+                sys.exit()
+            elif event.key == pg.K_s:
                 self.next = "MOUNTAINGUIDE"
                 self.done = True
             elif event.key == pg.K_r:
-                self.next = "BETTING"
+                self.next = "BETINSTRUCTIONS"
                 self.done = True
             elif event.key == pg.K_DOWN:
                 if self.fps > 20:
@@ -254,6 +204,15 @@ class Managing(tools._State):
                 if self.fps < self.max_fps:
                     self.fps += 10
         elif event.type == pg.MOUSEBUTTONDOWN:
+            #Testing - buildings should supercede elves
+            for elf in [x for x in self.world.elves if x.state in {"Hauling",
+                                                                                     "Travelling", "Idle"}]:
+                if elf.rect.collidepoint(event.pos):
+                    self.persist["elf"] = elf
+                    self.persist["previous"] = "MANAGING"
+                    self.next = "ELFPOPUP"
+                    self.done = True
+                    break
             for build in self.world.buildings:
                 if build.rect.collidepoint(event.pos):
                     self.persist["building"] = build
@@ -261,14 +220,7 @@ class Managing(tools._State):
                     self.next = "BUILDINGPOPUP"
                     self.done = True
                     break
-            for elf in [x for x in self.world.elves if x.state in {"Hauling",
-                                                                                     "Travelling"}]:
-                if elf.rect.collidepoint(event.pos):
-                    self.persist["elf"] = elf
-                    self.persist["previous"] = "MANAGING"
-                    self.next = "ELFPOPUP"
-                    self.done = True
-                    break
+            
 
     def update(self, surface, keys):
         self.world.update()            

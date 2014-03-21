@@ -1,6 +1,6 @@
 import pygame as pg
 from .. import tools
-from ..components.labels import GroupLabel as GLabel
+from ..components.labels import GroupLabel as GLabel, Label, Button
 
 class RaceResults(tools._State):    
     def __init__(self):
@@ -36,10 +36,19 @@ class RaceResults(tools._State):
                 self.player.cash += bet.payout
                 y_pos += 60
         self.player.bets = []
+        button_width = 120
+        button_height = 90
+        new_label = Label(24, "NEW RACE", "gray1", "center", 0, 0, "lightgray")
+        self.new_button = Button(screen_rect.centerx - button_width/2,
+                                         screen_rect.bottom - (30 + (button_height * 2)),
+                                         button_width, button_height, new_label)
+        quit_label = Label(24, "QUIT", "gray1", "center", 0, 0, "lightgray")
+        self.quit_button = Button(screen_rect.centerx - button_width/2,
+                                         screen_rect.bottom - (10 + button_height),
+                                         button_width, button_height, quit_label)
         
     def startup(self, persistant):
         self.player = persistant["player"] 
-        print persistant["results"]
         self.setup(persistant["results"])
         return tools._State.startup(self, persistant)
         
@@ -49,16 +58,22 @@ class RaceResults(tools._State):
         return tools._State.cleanup(self)
     
     def get_event(self, event):
-        if (event.type == pg.KEYDOWN or 
-                        event.type == pg.MOUSEBUTTONDOWN):
-            self.done = True
-
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if self.new_button.rect.collidepoint(event.pos):
+                self.next = "BETTING"
+                self.done = True
+            elif self.quit_button.rect.collidepoint(event.pos):
+                self.next = "MANAGING"
+                self.done = True
+                
     def update(self, surface, keys):
         surface.fill(pg.Color("white"))
         for result in self.results:
             result.name_label.display(surface)
         for label in self.labels:
-            label.display(surface)        
+            label.display(surface)
+        self.new_button.display(surface)
+        self.quit_button.display(surface)        
         
         
         

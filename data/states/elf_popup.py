@@ -51,7 +51,7 @@ class ElfPopup(tools._State):
         if elf.state in {"Travelling", "Hauling"}:
             activity = "{} to {}".format(elf.state, elf.venue.name)
         else:
-            activity = "{} to {}".format(elf.state)        
+            activity = "{}".format(elf.state)        
         activity_label = GLabel(self.labels, 14, activity, "gray1", "midtop", 
                                            self.popup.centerx,
                                            career_label.rect.bottom + 5, "white")
@@ -63,7 +63,6 @@ class ElfPopup(tools._State):
         label_left = self.popup.left + 10
         self.meters = []
         for stat in elf_stats:
-            print stat[1]
             meter = Meter((meter_left, meter_middle), 150, 10, stat[1])
             self.meters.append(meter)
             stat_label = GLabel(self.labels, 14, stat[0], "gray1", "midleft",

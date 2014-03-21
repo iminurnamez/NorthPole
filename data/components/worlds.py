@@ -15,17 +15,17 @@ class Cell(object):
         self.rect.move_ip((offset[0], offset[1]))
         
     def get_open_neighbors(self, world):
-        opens = [(self.index[0] - 1, self.index[1]), 
+        opens = {(self.index[0] - 1, self.index[1]), 
                       (self.index[0] + 1, self.index[1]), 
                       (self.index[0], self.index[1] - 1), 
-                      (self.index[0], self.index[1] + 1)]
-        
-        return [x for x in opens if x in world.grid and 
-                    not world.grid[x].occupied]
+                      (self.index[0], self.index[1] + 1)}
+        grid = world.grid
+        return [x for x in opens if x in grid and 
+                    not grid[x].occupied]
         
 class World(object):
     def __init__(self, width, height, tile_width, tile_height):
-        self.grid = OrderedDict()
+        self.grid = {}
         left = 0
         top = 0
         for i in range(height / tile_height):
@@ -33,7 +33,8 @@ class World(object):
                 self.grid[(j, i)] = Cell((j, i), (left, top), tile_width, tile_height)
                 left += tile_width
             left = 0
-            top += tile_height         
+            top += tile_height
+            
         self.trees = []
         self.elves = []
         self.buildings = []

@@ -67,7 +67,7 @@ class Boarding(tools._State):
                 self.done = True
             elif self.boarder.jumping:
                 try:
-                    if self.boarder.direction != opposites[event.key]:
+                    if self.boarder.direction != opposites[event.key]:    
                         self.boarder.direction = jump_map[event.key]
                         self.boarder.turned = True
                         self.boarder.jump_history += self.boarder.direction
@@ -81,4 +81,3 @@ class Boarding(tools._State):
                         self.boarder.grabbing = False                    
             elif event.key == pg.K_SPACE and not self.boarder.crashed:
                 self.boarder.glide.stop()        
-                    

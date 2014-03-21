@@ -1,5 +1,3 @@
-
-
 import random
 import pygame as pg
 import itertools as it
@@ -32,11 +30,11 @@ class Elf(object):
         self.food = self.max_food * .5
        
         self.strength = random.randint(50, 100)
-        #self.stats = {"Intelligence": ,
-        #                   "Gaiety": ,  #max_cheer
+        #self.stats = {"Wits": , # + skill acquisition
+        #                   "Mirth": ,  #max_cheer
         #                   "Stamina": , #max_energy
-        #                   "Strength": , #
-        #                   "Charm": #good reindeer handlers/entertainers
+        #                   "Strength": , #max_cargo
+        #                   "Charm": # + for reindeer handlers/donation army
         #                   
         #self.skills = {"Farming":
         #                   "Woodworking":
@@ -125,6 +123,9 @@ class Elf(object):
         self.move((self.x_velocity, self.y_velocity))
        
     def find_path(self, world):
+        the_world = world
+        grid = world.grid
+        
         depth = (abs(self.goal[0] - self.index[0]) + abs(self.goal[1] - self.index[1])) * 2
         neighbors = []
         visited = set()
@@ -134,10 +135,10 @@ class Elf(object):
         for i in range(1, depth + 1):
             more_neighbors = set()
             for a_neighbor in neighbors[i - 1]:
-                for next_neighbor in world.grid[a_neighbor].get_open_neighbors(world):
+                for next_neighbor in grid[a_neighbor].get_open_neighbors(the_world):
                     if next_neighbor in visited:
                         pass
-                    elif world.grid[next_neighbor].occupied:
+                    elif grid[next_neighbor].occupied:
                         visited.add(next_neighbor)
                     elif next_neighbor == self.goal:
                         visited.add(next_neighbor)
@@ -165,10 +166,11 @@ class Elf(object):
         while i < len(neighbors):
             reverse_route.append(best_landing_spot)
             candidates = []
-            for some_neighbor in world.grid[best_landing_spot].get_open_neighbors(world):
+            for some_neighbor in grid[best_landing_spot].get_open_neighbors(the_world):
                 if some_neighbor in neighbors[len(neighbors) -1 - (i + 1)]:
                     candidates.append(some_neighbor)
             
+            # Bug alerter - shouldn't need try/except
             try:
                 new_landing_spot = candidates[0]
             
@@ -200,7 +202,7 @@ class Elf(object):
         return reverse_route[::-1]
                 
     def work_check(self, world):
-        if (self.energy < 200 or # Use hard numbers like this so that elves with better stats have an advantage?
+        if (self.energy < 200 or
                     self.food < 150 or
                     self.cheer < 100):
             self.state = "Idle"
@@ -210,7 +212,7 @@ class Elf(object):
             return True
     
     def do_work(self, world):
-    # TODO - work should be incremented by skill check not a number    
+        # TODO - work should be incremented by skill check not a number    
         if self.job.name == "Wood Shed":
             if self.index == self.job.entrance:
                 if self.cargo:
@@ -220,7 +222,6 @@ class Elf(object):
                 open_trees = [x for x in world.trees if not x.workers + x.en_route_workers] 
                 tree = min(open_trees, key=lambda x: (abs(x.index[0] - self.index[0]) +
                                                                   abs(x.index[1] - self.index[1])))
-                
                 self.venue = tree
                 self.venue.en_route_workers.append(self)
                 self.goal = self.venue.entrance
@@ -277,8 +278,6 @@ class Elf(object):
             self.food -= 1
             self.cheer -= 1    
 
-               
-
     def update(self, world):
         if self.energy < 1:
             self.energy = 1
@@ -286,8 +285,7 @@ class Elf(object):
             self.cheer = 1
         if self.food < 1:
             self.food = 1
-
-        
+     
         if self.state == "Idle":
             if (self.energy > self.max_energy * .7 and 
                             self.food > self.max_food * .7 and
@@ -345,7 +343,7 @@ class Elf(object):
                 self.energy = self.max_energy
                 self.state = "Idle"
                 self.venue.patrons.remove(self)
-                self.index = self.home.entrance
+                self.index = self.venue.entrance
                 self.rect.center = world.grid[self.index].rect.center
             else:
                 if self.energy < self.max_energy / 3:
@@ -354,19 +352,13 @@ class Elf(object):
                     self.energy += 2
                 else:
                     self.energy += 3
-               
-        
+                
         elif self.state == "Working":
             self.do_work(world)
         
         elif self.state == "Eating":
             if self.food >= self.max_food:
-                # Fixing a bug - shouldn't need try/except
-                try:
-                    self.venue.patrons.remove(self)
-                except:
-                    print self.venue.name
-                    print self.venue.patrons
+                self.venue.patrons.remove(self)
                 self.food = self.max_food
                 self.state = "Idle"
                 self.index = self.venue.entrance
@@ -397,8 +389,8 @@ class Elf(object):
                 self.index = self.venue.entrance
                 self.rect.center = world.grid[self.index].rect.center
             else:
-                self.cheer += 2      # TODO: add venue quality for more cheer per turn
-                self.energy -= .5
+                self.venue.give_cheer(self)
+
                                 
         elif self.state == "Logging":
             if not world.ticks % 7:
@@ -442,8 +434,10 @@ class Elf(object):
                             new_cargo = product
                             amount = self.venue.outputs[product]
                     if new_cargo:
-                        self.cargo = (new_cargo, min(self.strength, self.venue.outputs[new_cargo]))                       
-                        self.venue.outputs[new_cargo] -= min(self.strength, self.venue.outputs[new_cargo])
+                        self.cargo = (new_cargo, min(self.strength,
+                                                                    self.venue.outputs[new_cargo]))                       
+                        self.venue.outputs[new_cargo] -= min(self.strength,
+                                                                                  self.venue.outputs[new_cargo])
                     self.venue = self.job
                     self.goal = self.venue.entrance
                     self.state = "Hauling"

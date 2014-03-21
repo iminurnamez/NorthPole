@@ -36,7 +36,7 @@ def main(fps, image_paths, bg_color="black"):
         ticks += 1
 
         
-main(60, ["elfupwalk1.png", "elfupwalk2.png"])       
+main(60, ["wavy1.png", "wavy2.png"])       
 #main(40, ["firework_ring" + str(x) + ".png" for x in range(1, 15)])        
 #main(30, ["racedeer1.png", "racedeer1.png", "racedeer1.png", "racedeer1.png", "racedeer1.png", "racedeer2.png", "racedeer3.png", "racedeer2.png"])
 #main(60, ["chop3.png", "chop1.png", "chop2.png", "chop1.png", "chop3.png"])

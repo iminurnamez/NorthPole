@@ -288,7 +288,7 @@ class GingerbreadHouse(Building):
         self.window_images = it.cycle([prepare.GFX["candywindow" + str(z)] for z in range(1, 10)])
         self.window_image = next(self.window_images)
         self.dimmer = pg.Surface((10, 10)).convert_alpha()
-        pg.draw.rect(self.dimmer, (0, 0, 0, 96), self.dimmer.get_rect().inflate(-2, -2))
+        pg.draw.rect(self.dimmer, (0, 0, 0, 60), self.dimmer.get_rect().inflate(-2, -2))
         self.max_patrons = 8
                                      
     def update(self, world):
@@ -404,7 +404,8 @@ class CarrotFarm(Building):
         super(CarrotFarm, self).__init__("Carrot Farm", index, (0, 2), world,
                                                         (64, 80), tile_map, char_map)
         self.windows = [Window((self.rect.left + 9, self.rect.top + 18), (7, 7))]
-        self.growth = 1 
+        self.growth = 0
+        self.current_growth = 0
         self.outputs["Carrot"] = 0
         self.max_workers = 2
         
@@ -413,15 +414,18 @@ class CarrotFarm(Building):
             window.update(world)
         for worker in self.workers:
             self.growth += 1  #TODO: should be from elf skill and use growth stages not modulo
-        if self.growth % 300 == 0:
+            self.current_growth += 1
+        if self.current_growth > 300:
+            self.current_growth -= 300
             for tile in self.tiles:
                 try:
                     tile.image = next(tile.images)
                 except AttributeError:
                     pass                
         if self.growth > 1500:
-            self.outputs["Carrot"] += 100    # TODO: should be from elf skill if growth isn't
-            self.growth = 1
+            self.outputs["Carrot"] += 100
+            self.growth = 0
+            self.current_growth = 0
 
 
 class WoodShed(Building):
@@ -512,13 +516,10 @@ class SnowForts(Building):
                                 RightThrower(self, (self.rect.left + 115,
                                                              self.rect.top + 24))]
         self.snowballs = []
-        self.in_use = 0
         self.max_patrons = 8
         
     def update(self, world):
-        if self.in_use < 0:
-            self.in_use = 0
-        if self.in_use:
+        if self.patrons:
             for elem in it.chain(self.throwers, self.snowballs):
                 elem.update(world)
             
@@ -527,10 +528,15 @@ class SnowForts(Building):
         for elem in it.chain(self.throwers, self.snowballs):
             elem.rect.move_ip(offset)
 
+    def give_cheer(self, elf):
+        if len(self.patrons) > 1:
+            elf.cheer += 1.5
+            elf.energy -= .5
+    
     def display(self, surface):
         for tile in self.tiles:
             tile.display(surface)
-        if self.in_use:
+        if len(self.patrons) > 1:
             for elem in it.chain(self.throwers, self.snowballs):
                 elem.display(surface)
                 
@@ -564,6 +570,11 @@ class Theater(Building):
         for elem in it.chain(self.throwers, self.snowballs):
             elem.rect.move_ip(offset)
 
+    def give_cheer(self, elf):
+        elf.cheer += 1
+        elf.energy += .3
+    
+    
     def display(self, surface):
         for tile in self.tiles:
             tile.display(surface)
@@ -607,7 +618,7 @@ class Skater(object):
             self.y_velocity *= -1
         if self.rect.left < rink_rect.left or self.rect.right > rink_rect.right:
             self.x_velocity *= -1
-            
+        
     def display(self, surface):
         surface.blit(self.image, self.rect)
             
@@ -640,6 +651,10 @@ class SkatingRink(Building):
         for skater in self.skaters:
             skater.rect.move_ip(offset)
 
+    def give_cheer(self, elf):
+        elf.cheer += 2.5
+        elf.energy += 1
+        
     def display(self, surface):
         for tile in self.tiles:
             tile.display(surface)
@@ -662,7 +677,7 @@ class SnackBar(Building):
                                           50: prepare.GFX["uppatron"]}
         self.patron_rects = []
         self.max_patrons = 12
-        self.inputs["Milk"] = 100  #Testing - should be 0
+        self.inputs["Milk"] = 1000  #Testing - should be 0
         self.inputs["Cookies"] = 0
     
     def update(self, world):
@@ -671,9 +686,10 @@ class SnackBar(Building):
                 self.inputs[key] = 0
         if len(self.patron_rects) < len(self.patrons):
             self.patron_rects.append(random.choice(
-                                          [x for x in self.slots if x not in self.patrons]))
-        elif len(self.patrons) > len(self.patron_rects):
-            self.patron_rects = self.patron_rects[1:]
+                                          [x for x in self.slots if x not in self.patron_rects]))
+        elif len(self.patron_rects) > len(self.patrons):
+            diff = len(self.patron_rects) - len(self.patrons)
+            self.patron_rects = self.patron_rects[diff:]
         
             
     def display(self, surface):
@@ -681,8 +697,5 @@ class SnackBar(Building):
             tile.display(surface)
         for patron_rect in self.patron_rects:
             surface.blit(self.patron_images[patron_rect[1]], 
-                             (self.rect.left + patron_rect[0], self.rect.top + patron_rect[1]))
-        
-
-    
+                             (self.rect.left + patron_rect[0], self.rect.top + patron_rect[1])) 
                 

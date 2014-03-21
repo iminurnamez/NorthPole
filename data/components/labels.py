@@ -108,7 +108,7 @@ class Meter(object):
         self.frame = pg.Rect(midleft[0], midleft[1] - height/2, width, height)
         self.bar = pg.Rect(self.frame.left, self.frame.top, width * value, height)
         self.color = (int(255 - (value * 255)), int(value * 255), 0)
-        print self.color
+
         
     def display(self, surface):
         pg.draw.rect(surface, pg.Color("gray20"), self.frame)

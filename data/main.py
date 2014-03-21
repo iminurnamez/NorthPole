@@ -9,7 +9,7 @@ and in the prepare module.
 from . import prepare,tools
 from .states import introsplash, managing, boarding, mountainguide
 from .states import betting, deerracing, raceresults
-from .states import elf_popup, building_popup, instructionsplash
+from .states import elf_popup, building_popup, instructionsplash, bet_instructions
 
 
 def main():
@@ -23,6 +23,7 @@ def main():
                          "BUILDINGPOPUP": building_popup.BuildingPopup(),
                          "MOUNTAINGUIDE": mountainguide.MountainGuide(),
                          "BOARDING" : boarding.Boarding(),
+                         "BETINSTRUCTIONS": bet_instructions.BettingSplash(),
                          "BETTING": betting.Betting(),
                          "DEERRACING": deerracing.DeerRacing(),
                          "RACINGRESULTS": raceresults.RaceResults()}
