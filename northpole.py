@@ -1,6 +1,4 @@
-"""
-This is an empty project template that facilitates the scene paradigm.
-"""
+#!/usr/bin/python2
 
 import sys
 import pygame as pg
