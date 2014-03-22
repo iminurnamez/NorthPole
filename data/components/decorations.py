@@ -71,8 +71,7 @@ class XmasTree(Decoration):
                     elf.cheer = elf.max_cheer
         if not world.ticks % 10:
             self.lights = next(self.light_cycle)
-            
-            
+                   
 class WavySanta(Decoration):
     def __init__(self, index, world):
         tile_map = ["XX",

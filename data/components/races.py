@@ -59,21 +59,7 @@ class Race(object):
         if self.racing:
             self.clouds = [x for x in self.clouds if x.rect.right > 0]
             for racer in self.racers:
-                if randint(1, 100) > racer.stamina:
-                    racer.energy -= .02
-                if racer.energy < 1:
-                    racer.energy = 1
-                movement = (randint(1, 1500) + 
-                                     (racer.speed * racer.energy * .01)) / 200.0
-                if not self.ticks % int((10 - int(movement))/2):
-                    racer.image = next(racer.images)
-                    racer.surface.fill(pg.Color("black"))
-                    racer.surface.blit(racer.image, (0, 0))                    
-                racer.x_pos += movement
-                racer.rect.centerx = int(racer.x_pos - self.dist_travelled) 
-                if racer.x_pos >= self.distance and racer not in self.results:
-                    self.results.append(racer)
-                    self.racers.remove(racer)
+                racer.update(self)
             if self.racers:
                 lead = max([x.rect.right for x in self.racers])
                 if lead >= self.screen_rect.width - 200:

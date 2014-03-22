@@ -285,6 +285,7 @@ class Elf(object):
             self.cheer = 1
         if self.food < 1:
             self.food = 1
+
      
         if self.state == "Idle":
             if (self.energy > self.max_energy * .7 and 

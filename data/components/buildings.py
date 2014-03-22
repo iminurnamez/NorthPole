@@ -124,6 +124,10 @@ class RinkTile(BuildingTile):
 class SnackBarTile(BuildingTile):
     def __init__(self, index, world):
         super(SnackBarTile, self).__init__(index, "Snack Bar", "snackbar", world)
+        
+class CarrotStandTile(BuildingTile):
+    def __init__(self, index, world):
+        super(CarrotStandTile, self).__init__(index, "Carrot Stand", "carrotstand", world)
 
 class Building(object):
     def __init__(self, name, index, entrance, world, size, tile_map, char_map):
@@ -248,7 +252,6 @@ class House(Building):
         char_map = {"H": HouseTile}
         super(House, self).__init__("House", index, (2, 4), world, (64, 80),
                                                  tile_map, char_map)
-        
         self.windows = [Window((self.rect.left + 11, self.rect.top + 53),
                                              (17, 18))]
         self.lights = HouseTreeLights((self.rect.left + 15, self.rect.top + 60))
@@ -292,7 +295,6 @@ class GingerbreadHouse(Building):
         self.max_patrons = 8
                                      
     def update(self, world):
-
         if self.patrons and not world.ticks % 6:
             self.window_image = next(self.window_images)
         for window in self.windows:
@@ -301,7 +303,6 @@ class GingerbreadHouse(Building):
     def display(self, surface):
         for tile in self.tiles:
             tile.display(surface)
-        
         for window in self.windows:
             window.display(surface, len(self.patrons))            
         for spot in self.window_spots:
@@ -327,8 +328,6 @@ class Barn(Building):
         #self.open_door = prepare.GFX["barndooropen"]
         #self.shut_door = prepare.GFX["barndoorshut"]
         #self.door_rect = self.shut_door.get_rect(topleft=(self.rect.left + 39, self.rect.top + 40))
-        
-        
         self.deer_rect = pg.Rect(self.rect.left + 1, self.rect.top + 45 , 109, 65) 
         self.reindeers = [Reindeer(self.rect.center, random.randint(1, 10), self),
                                  Reindeer(self.rect.center, random.randint(1, 10), self)]
@@ -621,7 +620,8 @@ class Skater(object):
         
     def display(self, surface):
         surface.blit(self.image, self.rect)
-            
+
+        
 class SkatingRink(Building):
     def __init__(self, index, world):
         tile_map = ["OOOOOOOOOOOO",
@@ -630,16 +630,19 @@ class SkatingRink(Building):
                           "OOOOOOOOOOOO", 
                           "ROOOOOOOOOOO"]
         char_map = {"R": RinkTile}
-        super(SkatingRink, self).__init__("Skating Rink", index, (9, 0), world,
-                                                       (192, 80), tile_map, char_map)
+        super(SkatingRink, self).__init__("Skating Rink", index, (9, 0),
+                                                          world, (192, 80), tile_map,
+                                                          char_map)
         self.rink_rect = pg.Rect(self.rect.left + 18, self.rect.top, 152, 68) 
         self.skaters = []
         self.max_patrons = 10
         
     def update(self, world):
         if len(self.skaters) < len(self.patrons):
-            x = random.randint(self.rink_rect.left + 5, self.rink_rect.right - 21)
-            y = random.randint(self.rink_rect.top, self.rink_rect.bottom - 21)
+            x = random.randint(self.rink_rect.left + 5,
+                                          self.rink_rect.right - 21)
+            y = random.randint(self.rink_rect.top,
+                                          self.rink_rect.bottom - 21)
             self.skaters.append(Skater((x, y)))
         if len(self.skaters) > len(self.patrons):
             self.skaters = self.skaters[1:]
@@ -670,8 +673,10 @@ class SnackBar(Building):
         char_map = {"B": SnackBarTile}
         super(SnackBar, self).__init__("Snack Bar", index, (0, 2), world,
                                                       (64, 64), tile_map, char_map)
-        self.up_slots = [(4, 41), (13, 41), (21, 41), (38, 41), (48, 41), (56, 41)]
-        self.down_slots = [(4, 50), (13, 50), (22, 50), (39, 50), (47, 50), (55, 50)]
+        self.up_slots = [(4, 41), (13, 41), (21, 41), (38, 41), (48, 41),
+                                (56, 41)]
+        self.down_slots = [(4, 50), (13, 50), (22, 50), (39, 50), (47, 50),
+                                    (55, 50)]
         self.slots = self.up_slots + self.down_slots
         self.patron_images = {41: prepare.GFX["downpatron"],
                                           50: prepare.GFX["uppatron"]}
@@ -697,5 +702,33 @@ class SnackBar(Building):
             tile.display(surface)
         for patron_rect in self.patron_rects:
             surface.blit(self.patron_images[patron_rect[1]], 
-                             (self.rect.left + patron_rect[0], self.rect.top + patron_rect[1])) 
-                
+                             (self.rect.left + patron_rect[0],
+                             self.rect.top + patron_rect[1]))
+                             
+                    
+class CarrotStand(Building):
+    def __init__(self, index, world):
+        tile_map = ["OO",
+                          "OO", 
+                          "BO"]
+        char_map = {"B": CarrotStandTile}
+        super(CarrotStand, self).__init__("Carrot Stand", index, (1, 2),
+                                                          world, (32, 48), tile_map,
+                                                          char_map)
+        self.food_rect = pg.Rect(self.rect.left - 32, self.rect.top, 96, 96)
+        self.inputs["Carrot"] = 10
+        
+    def move(self, offset):
+        self.rect.move_ip(offset)
+        self.food_rect.move_ip(offset)
+        
+    def update(self, world):
+        elves = world.elves
+        for elf in [x for x in elves if x.rect.colliderect(self.food_rect)]:
+            if self.inputs["Carrot"] >= .2:
+                elf.food += .2
+                self.inputs["Carrot"] -= .2
+                if elf.food > elf.max_food:
+                    elf.food = elf.max_food
+    
+     

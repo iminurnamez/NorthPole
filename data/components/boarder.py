@@ -19,8 +19,8 @@ class Boarder(object):
         self.y_velocity = 0
         self.image_dict = {
                     "brake": {"left": it.cycle([prepare.GFX["leftboardbrake1"],
-                                                             prepare.GFX["leftboardbrake2"],
-                                                             prepare.GFX["leftboardbrake3"]]),                                
+                                                          prepare.GFX["leftboardbrake2"],
+                                                          prepare.GFX["leftboardbrake3"]]),                                
                                    "right": it.cycle([prepare.GFX["rightboardbrake1"],
                                                             prepare.GFX["rightboardbrake2"],
                                                             prepare.GFX["rightboardbrake3"]]),
@@ -47,12 +47,11 @@ class Boarder(object):
                                                             prepare.GFX["crash3"],
                                                             prepare.GFX["crash4"],
                                                             prepare.GFX["crash5"]])}}
+        
         self.images = self.image_dict["no brake"][self.direction]
         self.image = next(self.images)
         self.rect = self.image.get_rect(topleft=lefttop)
-        self.surface = pg.Surface(self.rect.size)
-        self.surface.set_colorkey(pg.Color("black"))
-        self.surface.blit(self.image, (0, 0))
+        self.sized_rect = None
         self.spray_images = it.cycle([prepare.GFX["spray1"],
                                                   prepare.GFX["spray2"],
                                                   prepare.GFX["spray3"]])
@@ -159,8 +158,6 @@ class Boarder(object):
         else:
             self.images = self.image_dict["no brake"][self.direction]
         self.image = next(self.images)
-        self.surface.fill(pg.Color("black"))
-        self.surface.blit(self.image, (0, 0))
             
     def update(self, ticks, course, keys):
         if self.jumping:
@@ -240,12 +237,18 @@ class Boarder(object):
         else:
             if not ticks % 10:
                 self.image = next(self.images)
-                self.surface.blit(self.image, (0, 0))
+
         
             
     def display(self, surface):
         zrect = self.rect.move((0, int(self.zpos)))
-        surface.blit(self.image, zrect)
+        if self.zpos < 0:
+            size = (-self.zpos/12) * 2
+            sized_rect = zrect.inflate(size, size)
+            sized = pg.transform.scale(self.image, sized_rect.size)
+            surface.blit(sized, sized_rect)
+        else:    
+            surface.blit(self.image, zrect)
         
         if self.acceleration["braking"] and [x for x in [self.x_velocity,
                                                             self.y_velocity] if x != 0]:

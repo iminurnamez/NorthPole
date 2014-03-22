@@ -5,7 +5,6 @@ from .. import tools
 from ..components import worlds, buildings, elves, decorations
 
 
-
 class Managing(tools._State):
     def __init__(self):
         super(Managing, self).__init__()
@@ -160,6 +159,7 @@ class Managing(tools._State):
         wavysanta = decorations.WavySanta((54, 30), self.world)
         rink = buildings.SkatingRink((38, 35), self.world)
         snackbar = buildings.SnackBar((34, 40), self.world)
+        carrotstand = buildings.CarrotStand((50, 10), self.world)
         self.world.trees = [buildings.Tree((10, 10), self.world),
                                     buildings.Tree((12, 12), self.world),
                                     buildings.Tree((14, 42), self.world),
@@ -170,7 +170,7 @@ class Managing(tools._State):
                                     buildings.Tree((30, 3), self.world)]
         self.world.buildings = [farm1, farm2, elf_house, elf_house2, fort,
                                           barn1, warehouse1, theater, rink,
-                                          woodshed, snackbar, ghouse]
+                                          woodshed, snackbar, ghouse, carrotstand]
         self.world.food_buildings.append(snackbar)
         self.world.cheer_buildings.append(fort)
         self.world.cheer_buildings.append(theater)
@@ -220,17 +220,16 @@ class Managing(tools._State):
                     self.next = "BUILDINGPOPUP"
                     self.done = True
                     break
-            
 
     def update(self, surface, keys):
         self.world.update()            
         surface.fill(pg.Color("grey96"))
         self.world.display(surface)
-        
+
     def startup(self, persistant):
         self.player = persistant["player"]
         return tools._State.startup(self, persistant)    
-    
+
     def cleanup(self):
         self.persist["player"] = self.player
         self.done = False
