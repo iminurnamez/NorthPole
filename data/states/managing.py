@@ -1,7 +1,7 @@
 import sys
 import random
 import pygame as pg
-from .. import tools
+from .. import tools, prepare
 from ..components import worlds, buildings, elves, decorations
 
 
@@ -193,9 +193,11 @@ class Managing(tools._State):
                 sys.exit()
             elif event.key == pg.K_s:
                 self.next = "MOUNTAINGUIDE"
+                pg.mixer.music.stop()
                 self.done = True
             elif event.key == pg.K_r:
                 self.next = "BETINSTRUCTIONS"
+                pg.mixer.music.stop()
                 self.done = True
             elif event.key == pg.K_DOWN:
                 if self.fps > 20:
@@ -228,6 +230,9 @@ class Managing(tools._State):
 
     def startup(self, persistant):
         self.player = persistant["player"]
+        if not pg.mixer.music.get_busy():
+            pg.mixer.music.load(prepare.MUSIC["song1"])
+            pg.mixer.music.play(-1)
         return tools._State.startup(self, persistant)    
 
     def cleanup(self):

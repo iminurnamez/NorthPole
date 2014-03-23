@@ -25,7 +25,7 @@ TEXT64 = pg.font.Font("freesansbold.ttf", 64)
 
 #Resource loading (Fonts and music just contain path names).
 #FONTS = tools.load_all_fonts(os.path.join("resources", "fonts"))
-#MUSIC = tools.load_all_music(os.path.join("resources", "music"))
+MUSIC = tools.load_all_music(os.path.join("resources", "music"))
 SFX   = tools.load_all_sfx(os.path.join("resources", "sound"))
 GFX   = tools.load_all_gfx(os.path.join("resources", "graphics"))
 pics = [GFX["firework" + str(i)] for i in range(1, 15)]

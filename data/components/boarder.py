@@ -38,7 +38,7 @@ class Boarder(object):
                                  "right": it.cycle([prepare.GFX["rightgrab"]]),
                                  "down": it.cycle([prepare.GFX["downgrab"]]),
                                  "up": it.cycle([prepare.GFX["upgrab"]])},
-                    "no grab": {"left": it.cycle([prepare.GFX["leftjump"]]),                                
+                    "no grab": {"left": it.cycle([prepare.GFX["leftjump"]]),
                                       "right": it.cycle([prepare.GFX["rightjump"]]),
                                       "down": it.cycle([prepare.GFX["downjump"]]),
                                       "up": it.cycle([prepare.GFX["upjump"]])},
@@ -107,7 +107,6 @@ class Boarder(object):
             self.y_velocity = 1
             for key in self.acceleration:
                 self.acceleration[key] = False
-            
         
     def recover(self):
         self.crashed = False 
@@ -167,6 +166,7 @@ class Boarder(object):
                 self.zpos -= 1
             elif self.zpos < 0:
                 self.zpos += 1
+                self.y_velocity = 1.5
             if self.zpos >= 0:
                 self.jumping = False
                 self.jump_count = 0
@@ -237,13 +237,11 @@ class Boarder(object):
         else:
             if not ticks % 10:
                 self.image = next(self.images)
-
-        
-            
+          
     def display(self, surface):
         zrect = self.rect.move((0, int(self.zpos)))
         if self.zpos < 0:
-            size = (-self.zpos/12) * 2
+            size = (-self.zpos/15) * 2
             sized_rect = zrect.inflate(size, size)
             sized = pg.transform.scale(self.image, sized_rect.size)
             surface.blit(sized, sized_rect)

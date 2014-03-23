@@ -194,6 +194,7 @@ class Building(object):
             tile.display(surface)
        
 class Warehouse(Building):
+    footprint = (7, 6)
     def __init__(self, index, world):
         tile_map =  ["XXXXXXX",
                           "OOOOOOO",
@@ -223,6 +224,7 @@ class Warehouse(Building):
                 surface.blit(self.door_image, door_rect)
                 
 class Tree(Building):
+    footprint = (1, 1)
     def __init__(self, index, world):
         tile_map = ["XX",
                           "TX"]
@@ -243,6 +245,7 @@ class Tree(Building):
         
     
 class House(Building):
+    footprint = (4, 4)
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOOO",
@@ -275,6 +278,7 @@ class House(Building):
 
         
 class GingerbreadHouse(Building):
+    footprint = (5, 4)
     def __init__(self, index, world):
         tile_map = ["XXXXX",
                            "XXXXX",
@@ -311,6 +315,7 @@ class GingerbreadHouse(Building):
 
         
 class Barn(Building):
+    footprint = (7, 6)
     def __init__(self, index, world):
         tile_map = ["XXXXXXX",
                           "OOOOOOO",
@@ -360,6 +365,7 @@ class Barn(Building):
 
             
 class MossFarm(Building):
+    footprint = (4, 4)
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOMM",
@@ -392,6 +398,7 @@ class MossFarm(Building):
             
             
 class CarrotFarm(Building):
+    footprint = (4, 4)
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOCC",
@@ -428,6 +435,7 @@ class CarrotFarm(Building):
 
 
 class WoodShed(Building):
+    footprint = (2, 2)
     def __init__(self, index, world):
         tile_map = ["OX",
                           "WO"]
@@ -503,6 +511,7 @@ class RightThrower(Thrower):
                              (58,21),(55,24),(52,27)]
                  
 class SnowForts(Building):
+    footprint = (10, 3)
     def __init__(self, index, world):
         tile_map = ["OOOOOOOOOO",
                           "XOOOOOOOOO", 
@@ -541,6 +550,7 @@ class SnowForts(Building):
                 
                 
 class Theater(Building):
+    footprint = (3, 3)
     def __init__(self, index, world):
         tile_map = ["XXX",
                           "OOO",
@@ -623,6 +633,7 @@ class Skater(object):
 
         
 class SkatingRink(Building):
+    footprint = (12, 5)
     def __init__(self, index, world):
         tile_map = ["OOOOOOOOOOOO",
                           "OOOOOOOOOOOO",
@@ -665,8 +676,9 @@ class SkatingRink(Building):
             skater.display(surface)
 
 class SnackBar(Building):
+    footprint = (4, 3)
     def __init__(self, index, world):
-        tile_map = ["OOOO",
+        tile_map = ["XXXX",
                           "OOOO",
                           "OOOO", 
                           "BOOO"]
@@ -707,10 +719,11 @@ class SnackBar(Building):
                              
                     
 class CarrotStand(Building):
+    footprint = (1, 1)
     def __init__(self, index, world):
-        tile_map = ["OO",
-                          "OO", 
-                          "BO"]
+        tile_map = ["XX",
+                          "XX", 
+                          "BX"]
         char_map = {"B": CarrotStandTile}
         super(CarrotStand, self).__init__("Carrot Stand", index, (1, 2),
                                                           world, (32, 48), tile_map,

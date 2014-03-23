@@ -38,6 +38,7 @@ class Decoration(object):
                     elf.cheer = elf.max_cheer
 
 class XmasTree(Decoration):
+    footprint = (1, 1)
     def __init__(self, index, world):                
         tile_map = ["XX",
                           "TX"]
@@ -73,6 +74,7 @@ class XmasTree(Decoration):
             self.lights = next(self.light_cycle)
                    
 class WavySanta(Decoration):
+    footprint = (2, 1)
     def __init__(self, index, world):
         tile_map = ["XX",
                           "XX",
@@ -97,6 +99,7 @@ class WavySanta(Decoration):
 
             
 class PyroBox(Decoration):
+    footprint = (1, 1)
     colors = [
                   #"dodgerblue4",
                   #"orangered",

@@ -1,4 +1,5 @@
 import os
+from random import choice
 import json
 import pygame as pg
 
@@ -25,6 +26,11 @@ class Boarding(tools._State):
     def startup(self, persistant):
         self.__init__()
         self.player = persistant["player"] 
+        if not pg.mixer.music.get_busy():
+            song = choice([prepare.MUSIC["heist_boogie"],
+                                   prepare.MUSIC["tiajuana"]])
+            pg.mixer.music.load(song)
+            pg.mixer.music.play(-1)
         pg.mouse.set_visible(False)
         return tools._State.startup(self, persistant)
         
@@ -60,10 +66,9 @@ class Boarding(tools._State):
                             pg.K_LEFT: "right",
                             pg.K_RIGHT: "left"}
         
-        if event.type == pg.QUIT:
-            return False 
-        elif event.type == pg.KEYDOWN:
+        if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
+                pg.mixer.music.stop()
                 self.done = True
             elif self.boarder.jumping:
                 try:
