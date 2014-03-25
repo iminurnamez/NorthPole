@@ -89,8 +89,8 @@ class Button(object):
         return self.rect.collidepoint(point)
         
     def display(self, surface):
-       pg.draw.rect(surface, pg.Color("lightgray"), self.rect)
-       pg.draw.rect(surface, pg.Color("gray30"), self.rect, 2)
+       pg.draw.rect(surface, pg.Color("white"), self.rect)
+       pg.draw.rect(surface, pg.Color("maroon"), self.rect, 2)
        self.label.display(surface)
 
 class PayloadButton(Button):

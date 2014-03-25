@@ -41,7 +41,6 @@ class World(object):
         self.rest_buildings = []
         self.cheer_buildings = []
         self.food_buildings = []
-        self.residences = []
         self.decorations = []
         self.ticks = 1
         

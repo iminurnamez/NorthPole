@@ -193,11 +193,15 @@ class Managing(tools._State):
                 sys.exit()
             elif event.key == pg.K_s:
                 self.next = "MOUNTAINGUIDE"
-                pg.mixer.music.stop()
                 self.done = True
             elif event.key == pg.K_r:
                 self.next = "BETINSTRUCTIONS"
-                pg.mixer.music.stop()
+                self.done = True
+            elif event.key == pg.K_p:
+                self.next = "BUILDINGPLACEMENT"
+                self.persist["player"] = self.player
+                self.persist["building type"] = buildings.GingerbreadHouse
+                self.persist["world"] = self.world
                 self.done = True
             elif event.key == pg.K_DOWN:
                 if self.fps > 20:
@@ -224,18 +228,19 @@ class Managing(tools._State):
                     break
 
     def update(self, surface, keys):
+        if not pg.mixer.music.get_busy():
+            pg.mixer.music.load(prepare.MUSIC["song1"])
+            pg.mixer.music.play(-1)
         self.world.update()            
         surface.fill(pg.Color("grey96"))
         self.world.display(surface)
 
     def startup(self, persistant):
         self.player = persistant["player"]
-        if not pg.mixer.music.get_busy():
-            pg.mixer.music.load(prepare.MUSIC["song1"])
-            pg.mixer.music.play(-1)
         return tools._State.startup(self, persistant)    
 
     def cleanup(self):
+        pg.mixer.music.fadeout(1500)
         self.persist["player"] = self.player
         self.done = False
         return self.persist

@@ -10,7 +10,7 @@ from . import prepare,tools
 from .states import introsplash, managing, boarding, mountainguide
 from .states import betting, deerracing, raceresults
 from .states import elf_popup, building_popup, instructionsplash, bet_instructions
-
+from .states import building_placement
 
 def main():
     """Add states to control here."""
@@ -21,6 +21,8 @@ def main():
                          "MANAGING": managing.Managing(),
                          "ELFPOPUP": elf_popup.ElfPopup(),
                          "BUILDINGPOPUP": building_popup.BuildingPopup(),
+                         #"BUILDINGSELECTION": building_selection.BuildingSelection(), 
+                         "BUILDINGPLACEMENT": building_placement.BuildingPlacement(),
                          "MOUNTAINGUIDE": mountainguide.MountainGuide(),
                          "BOARDING" : boarding.Boarding(),
                          "BETINSTRUCTIONS": bet_instructions.BettingSplash(),

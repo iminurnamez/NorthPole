@@ -169,6 +169,8 @@ class Building(object):
             top += 16
             right = 16
         world.grid[self.entrance].occupied = False
+        world.buildings.append(self)
+        
         
     def has_patron_vacancies(self):
         return (len(self.en_route_patrons) + len(self.patrons) <
@@ -195,6 +197,7 @@ class Building(object):
        
 class Warehouse(Building):
     footprint = (7, 6)
+    size = (112, 112)
     def __init__(self, index, world):
         tile_map =  ["XXXXXXX",
                           "OOOOOOO",
@@ -205,12 +208,11 @@ class Warehouse(Building):
                           "WOOOOOO"]
         char_map = {"W": WarehouseTile}                  
         super(Warehouse, self).__init__("Warehouse", index, (2, 6), world,
-                                                        (112, 112), tile_map, char_map)
+                                                        self.size, tile_map, char_map)
         self.outputs = defaultdict(int)
         self.door_image = prepare.GFX["warehousedoor"]
         door_rect = self.door_image.get_rect(topleft=self.rect.topleft)
         self.door_rects = [door_rect.move(28, 96), door_rect.move(57, 96)]
-
         self.workers = []
         self.max_workers = 12
 
@@ -225,15 +227,17 @@ class Warehouse(Building):
                 
 class Tree(Building):
     footprint = (1, 1)
+    size = (32, 32)
     def __init__(self, index, world):
         tile_map = ["XX",
                           "TX"]
         char_map = {"T": TreeTile}
-        super(Tree, self).__init__("Tree", index, (1, 1), world, (32, 32),
+        super(Tree, self).__init__("Tree", index, (1, 1), world, self.size,
                                               tile_map, char_map)
         self.wood = 1000
         self.outputs["wood"] = 0
         self.max_workers = 1
+        world.trees.append(self)
   
     def update(self, world):            
         if self.wood < 1:
@@ -246,6 +250,7 @@ class Tree(Building):
     
 class House(Building):
     footprint = (4, 4)
+    size = (64, 80)
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOOO",
@@ -253,12 +258,13 @@ class House(Building):
                           "OOOO",
                           "HOXO"]
         char_map = {"H": HouseTile}
-        super(House, self).__init__("House", index, (2, 4), world, (64, 80),
+        super(House, self).__init__("House", index, (2, 4), world, self.size,
                                                  tile_map, char_map)
         self.windows = [Window((self.rect.left + 11, self.rect.top + 53),
                                              (17, 18))]
         self.lights = HouseTreeLights((self.rect.left + 15, self.rect.top + 60))
         self.max_patrons = 6
+        world.rest_buildings.append(self)
         
     def move(self, offset):
         for tile in it.chain(self.rect, self.tiles, self.windows, self.lights):
@@ -279,6 +285,7 @@ class House(Building):
         
 class GingerbreadHouse(Building):
     footprint = (5, 4)
+    size = (80, 96)
     def __init__(self, index, world):
         tile_map = ["XXXXX",
                            "XXXXX",
@@ -288,7 +295,7 @@ class GingerbreadHouse(Building):
                            "GOOOO"]
         char_map = {"G": GingerHouseTile}
         super(GingerbreadHouse, self).__init__("Gingerbread House", index, (2, 5), world,
-                                                                   (80, 96), tile_map, char_map)
+                                                                   self.size, tile_map, char_map)
         coords = [(16, 41), (16, 61), (34, 41), (52, 41), (52, 61)]
         self.window_spots = [(self.rect.left + x[0], self.rect.top + x[1]) for x in coords]
         self.windows = [Window(y, (10, 10)) for y in self.window_spots]
@@ -297,6 +304,7 @@ class GingerbreadHouse(Building):
         self.dimmer = pg.Surface((10, 10)).convert_alpha()
         pg.draw.rect(self.dimmer, (0, 0, 0, 60), self.dimmer.get_rect().inflate(-2, -2))
         self.max_patrons = 8
+        world.rest_buildings.append(self)
                                      
     def update(self, world):
         if self.patrons and not world.ticks % 6:
@@ -316,6 +324,7 @@ class GingerbreadHouse(Building):
         
 class Barn(Building):
     footprint = (7, 6)
+    size = (112, 112)
     def __init__(self, index, world):
         tile_map = ["XXXXXXX",
                           "OOOOOOO",
@@ -325,7 +334,7 @@ class Barn(Building):
                           "OOOOOOO",
                           "BOOOOOO"]
         char_map = {"B": BarnTile}        
-        super(Barn, self).__init__("Barn", index, (4, 6), world, (112, 112),
+        super(Barn, self).__init__("Barn", index, (4, 6), world, self.size,
                                                tile_map, char_map)
         self.door_image = prepare.GFX["barndoor"]
         self.open_rect = self.door_image.get_rect(topleft=(self.rect.left + 38, self.rect.top + 41))
@@ -366,6 +375,7 @@ class Barn(Building):
             
 class MossFarm(Building):
     footprint = (4, 4)
+    size = (64, 80)
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOMM",
@@ -375,7 +385,7 @@ class MossFarm(Building):
         char_map = {"M": MossTile,
                              "S": PottingShed}
         super(MossFarm, self).__init__("Moss Farm", index, (0, 2), world,
-                                                      (64, 80), tile_map, char_map)
+                                                      self.size, tile_map, char_map)
         self.windows = [Window((self.rect.left + 9, self.rect.top + 18), (7, 7))]
         self.growth = 1
         self.outputs["Moss"] = 0
@@ -399,6 +409,7 @@ class MossFarm(Building):
             
 class CarrotFarm(Building):
     footprint = (4, 4)
+    size = (64, 80)
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOCC",
@@ -408,7 +419,7 @@ class CarrotFarm(Building):
         char_map = {"C": CarrotTile,
                              "S": PottingShed}
         super(CarrotFarm, self).__init__("Carrot Farm", index, (0, 2), world,
-                                                        (64, 80), tile_map, char_map)
+                                                        self.size, tile_map, char_map)
         self.windows = [Window((self.rect.left + 9, self.rect.top + 18), (7, 7))]
         self.growth = 0
         self.current_growth = 0
@@ -436,12 +447,13 @@ class CarrotFarm(Building):
 
 class WoodShed(Building):
     footprint = (2, 2)
+    size = (32, 32)
     def __init__(self, index, world):
         tile_map = ["OX",
                           "WO"]
         char_map = {"W": WoodShedTile}
         super(WoodShed, self).__init__("Wood Shed", index, (0, 1), world,
-                                                      (32, 32), tile_map, char_map)
+                                                       self.size, tile_map, char_map)
         self.outputs["Wood"] = 0
         self.max_workers = 4
         
@@ -512,19 +524,21 @@ class RightThrower(Thrower):
                  
 class SnowForts(Building):
     footprint = (10, 3)
+    size = (160, 48)
     def __init__(self, index, world):
         tile_map = ["OOOOOOOOOO",
                           "XOOOOOOOOO", 
                           "FOOOOOOOOO"]
         char_map = {"F": FortsTile}
         super(SnowForts, self).__init__("Snow Forts", index, (0, 1), world,
-                                                       (160, 48), tile_map, char_map)
+                                                       self.size, tile_map, char_map)
         self.throwers = [LeftThrower(self, (self.rect.left + 37,
                                                            self.rect.top + 24)), 
                                 RightThrower(self, (self.rect.left + 115,
                                                              self.rect.top + 24))]
         self.snowballs = []
         self.max_patrons = 8
+        world.cheer_buildings.append(self)
         
     def update(self, world):
         if self.patrons:
@@ -551,6 +565,7 @@ class SnowForts(Building):
                 
 class Theater(Building):
     footprint = (3, 3)
+    size = (48, 64)
     def __init__(self, index, world):
         tile_map = ["XXX",
                           "OOO",
@@ -558,7 +573,7 @@ class Theater(Building):
                           "TOO"]
         char_map = {"T": TheaterTile}
         super(Theater, self).__init__("Theater", index, (0, 3), world,
-                                                       (48, 64), tile_map, char_map)
+                                                   self.size, tile_map, char_map)
         self.puppet_images = it.cycle([prepare.GFX["puppet" + str(x)] for x in range(1, 18)])
         self.puppet_image = next(self.puppet_images)
         self.curtain_image = prepare.GFX["curtain"]
@@ -568,6 +583,7 @@ class Theater(Building):
         self.patron_rects = [pg.Rect(self.rect.left + x[0], self.rect.top + x[1], 5, 14) for x in patron_offsets]
         self.in_use = 0
         self.max_patrons = 6
+        world.cheer_buildings.append(self)
         
     def update(self, world):
         if self.patrons:
@@ -634,6 +650,7 @@ class Skater(object):
         
 class SkatingRink(Building):
     footprint = (12, 5)
+    size = (192, 80)
     def __init__(self, index, world):
         tile_map = ["OOOOOOOOOOOO",
                           "OOOOOOOOOOOO",
@@ -642,11 +659,12 @@ class SkatingRink(Building):
                           "ROOOOOOOOOOO"]
         char_map = {"R": RinkTile}
         super(SkatingRink, self).__init__("Skating Rink", index, (9, 0),
-                                                          world, (192, 80), tile_map,
+                                                          world, self.size, tile_map,
                                                           char_map)
         self.rink_rect = pg.Rect(self.rect.left + 18, self.rect.top, 152, 68) 
         self.skaters = []
         self.max_patrons = 10
+        world.cheer_buildings.append(self)
         
     def update(self, world):
         if len(self.skaters) < len(self.patrons):
@@ -677,6 +695,7 @@ class SkatingRink(Building):
 
 class SnackBar(Building):
     footprint = (4, 3)
+    size = (64, 64)
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOOO",
@@ -684,7 +703,7 @@ class SnackBar(Building):
                           "BOOO"]
         char_map = {"B": SnackBarTile}
         super(SnackBar, self).__init__("Snack Bar", index, (0, 2), world,
-                                                      (64, 64), tile_map, char_map)
+                                                      self.size, tile_map, char_map)
         self.up_slots = [(4, 41), (13, 41), (21, 41), (38, 41), (48, 41),
                                 (56, 41)]
         self.down_slots = [(4, 50), (13, 50), (22, 50), (39, 50), (47, 50),
@@ -696,6 +715,7 @@ class SnackBar(Building):
         self.max_patrons = 12
         self.inputs["Milk"] = 1000  #Testing - should be 0
         self.inputs["Cookies"] = 0
+        world.food_buildings.append(self)
     
     def update(self, world):
         for key in self.inputs:
@@ -720,13 +740,14 @@ class SnackBar(Building):
                     
 class CarrotStand(Building):
     footprint = (1, 1)
+    size = (32, 48)
     def __init__(self, index, world):
         tile_map = ["XX",
                           "XX", 
                           "BX"]
         char_map = {"B": CarrotStandTile}
         super(CarrotStand, self).__init__("Carrot Stand", index, (1, 2),
-                                                          world, (32, 48), tile_map,
+                                                          world, self.size, tile_map,
                                                           char_map)
         self.food_rect = pg.Rect(self.rect.left - 32, self.rect.top, 96, 96)
         self.inputs["Carrot"] = 10
@@ -743,5 +764,6 @@ class CarrotStand(Building):
                 self.inputs["Carrot"] -= .2
                 if elf.food > elf.max_food:
                     elf.food = elf.max_food
+
     
      

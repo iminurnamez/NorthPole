@@ -26,21 +26,24 @@ class Boarding(tools._State):
     def startup(self, persistant):
         self.__init__()
         self.player = persistant["player"] 
-        if not pg.mixer.music.get_busy():
-            song = choice([prepare.MUSIC["heist_boogie"],
-                                   prepare.MUSIC["tiajuana"]])
-            pg.mixer.music.load(song)
-            pg.mixer.music.play(-1)
         pg.mouse.set_visible(False)
         return tools._State.startup(self, persistant)
         
     def cleanup(self):
-        pg.mouse.set_visible(True)
+        if self.next != "BOARDING":
+            pg.mixer.music.fadeout(1500)
+            pg.mouse.set_visible(True)
         self.persist["player"] = self.player
         self.done = False
         return tools._State.cleanup(self)
         
     def update(self, surface, keys):
+        if not pg.mixer.music.get_busy():
+            song = choice([prepare.MUSIC["heist_boogie"],
+                                   prepare.MUSIC["tiajuana"]])
+            pg.mixer.music.load(song)
+            pg.mixer.music.play()
+            
         self.boarder.update(self.ticks, self.course, keys)
         self.course.update(self.boarder, surface.get_rect(), self.ticks)
         
@@ -68,7 +71,6 @@ class Boarding(tools._State):
         
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
-                pg.mixer.music.stop()
                 self.done = True
             elif self.boarder.jumping:
                 try:
