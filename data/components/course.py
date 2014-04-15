@@ -1,13 +1,11 @@
 import itertools as it
 import pygame as pg
 from obstacles import (Tree, RightGate, LeftGate, Jump, Rock, Pylon, UpChair, 
-DownChair, TopLiftHut, BottomLiftHut)
+                                    DownChair, TopLiftHut, BottomLiftHut)
 
 class Course(object):
-    def __init__(self, course_width, course_length, obstacle_list):
+    def __init__(self, obstacle_list):
         screen_rect = pg.display.get_surface().get_rect()
-        self.width = course_width
-        self.length = course_length
         class_map = {"tree": Tree,
                              "rightgate": RightGate,
                              "leftgate": LeftGate,
@@ -26,7 +24,12 @@ class Course(object):
         self.downchairs = []
         
         for item in obstacle_list:
-            obstacle = class_map[item[0].lower()]((item[1][0] - ((self.width/2) - (screen_rect.width / 2)), item[1][1]), self)            
+            if item[0] == "Width":
+                self.width = item[1]
+            elif item[0] == "Length":
+                self.length = item[1]
+            else:
+                obstacle = class_map[item[0].lower()]((item[1][0] - ((self.width/2) - (screen_rect.width / 2)), item[1][1]), self)            
         if self.pylons:
             hutleft = self.pylons[0].rect.left + 2
         else:

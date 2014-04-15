@@ -13,18 +13,16 @@ class Boarding(tools._State):
     def __init__(self):
         tools._State.__init__(self)
         self.next = "MANAGING"
-        self.clock = pg.time.Clock()
         self.fps = 60
+    
+    def startup(self, persistant):
+        self.next = "MANAGING"
         self.ticks = 1
-        
-        with open(os.path.join("resources", "mtkringle.json"), "r") as f:
+        with open(os.path.join("resources", "mtkringle.json"), "r") as f: #"mtkringle.json"slalom1.json
             course_items = json.load(f)
-        self.course = course.Course(1920, 16000, course_items)        
+        self.course = course.Course(course_items)    
         self.boarder = boarder.Boarder(
                               (pg.display.get_surface().get_width() / 2, 0))
-        
-    def startup(self, persistant):
-        self.__init__()
         self.player = persistant["player"] 
         pg.mouse.set_visible(False)
         return tools._State.startup(self, persistant)

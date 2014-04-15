@@ -2,7 +2,7 @@ import random
 import pygame as pg
 from .. import prepare, tools
 
-       
+      
 class Obstacle(object):
     def __init__(self, name, lefttop, collider_tl, collider_size):
         self.name = name
@@ -162,5 +162,17 @@ class FinishLine(object):
     def collide_with_boarder(self, boarder):
         pass 
         
+        
+class DiscBasket(Obstacle):
+    def __init__(self, lefttop, course):
+        super(DiscBasket, self).__init__("discbasket", lefttop, (6, 4), (21, 16))
+        course.basket = self
+        course.obstacles.append(self)
+
+class TeeBox(object):
+    def __init__(self, lefttop, course):
+        self.image = prepare.GFX["teebox"]
+        self.rect = self.image.get_rect(topleft=lefttop)
+        course.teebox = self
         
         

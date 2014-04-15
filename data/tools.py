@@ -173,3 +173,6 @@ def load_all_sfx(directory, accept=(".wav", ".mp3", ".ogg", ".mdi")):
         if ext.lower() in accept:
             effects[name] = pg.mixer.Sound(os.path.join(directory, fx))
     return effects
+
+def load_all_fonts(directory, accept=(".ttf")):
+    return load_all_music(directory, accept)

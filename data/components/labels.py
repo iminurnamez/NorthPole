@@ -2,20 +2,11 @@ import pygame as pg
 
 from .. import prepare
 
-font_map = {12: prepare.TEXT12, 
-                    14: prepare.TEXT14,
-                    16: prepare.TEXT16,
-                    18: prepare.TEXT18,
-                    20: prepare.TEXT20,
-                    24: prepare.TEXT24,
-                    32: prepare.TEXT32,
-                    48: prepare.TEXT48,
-                    64: prepare.TEXT64}
                    
 class MasterLabel(object):
     def __init__(self, font_size, text, text_color, rect_attribute,
                           x, y, bground_color):
-        self.text = font_map[font_size].render(
+        self.text = pg.font.Font(prepare.FONTS["freesansbold"], font_size).render(
                                            text, True, pg.Color(text_color),
                                            pg.Color(bground_color)).convert()
         if rect_attribute == "topleft":
@@ -114,4 +105,12 @@ class Meter(object):
         pg.draw.rect(surface, pg.Color("gray20"), self.frame)
         pg.draw.rect(surface, self.color, self.bar)
         pg.draw.rect(surface, pg.Color("gray40"), self.frame, 2)
-
+                                
+    
+    def update(self):
+        self.text_label = Label(16, self.text, "gray1", "midleft", self.text_field.left + 2,
+                                          self.text_field.centery, "lightgray")        
+    def draw(self, surface):
+        pg.draw.rect(surface, pg.Color("white"), self.window)
+        pg.draw.rect(surface, pg.Color("maroon"), self.window, 3)
+        
