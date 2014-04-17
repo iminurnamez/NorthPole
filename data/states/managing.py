@@ -203,6 +203,11 @@ class Managing(tools._State):
                 self.persist["building type"] = buildings.GingerbreadHouse
                 self.persist["world"] = self.world
                 self.done = True
+            elif event.key == pg.K_d:
+                self.next = "GOLFING"
+                self.persist["player"] = self.player
+                self.persist["hole"] = "dghole7"
+                self.done = True
             elif event.key == pg.K_DOWN:
                 if self.fps > 20:
                     self.fps -= 10

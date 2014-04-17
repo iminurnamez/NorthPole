@@ -18,9 +18,7 @@ class Boarding(tools._State):
     def startup(self, persistant):
         self.next = "MANAGING"
         self.ticks = 1
-        with open(os.path.join("resources", "mtkringle.json"), "r") as f: #"mtkringle.json"slalom1.json
-            course_items = json.load(f)
-        self.course = course.Course(course_items)    
+        self.course = course.Course(prepare.COURSES["mtkringle"])    
         self.boarder = boarder.Boarder(
                               (pg.display.get_surface().get_width() / 2, 0))
         self.player = persistant["player"] 

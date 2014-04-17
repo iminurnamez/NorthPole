@@ -1,3 +1,7 @@
+from math import radians, sin, cos, hypot
+from random import uniform
+import pygame as pg
+
 class Disc(object):
     def __init__(self, speed, loft, pull, fade, color, pos, power, angle):
         self.base_speed = speed * .1
@@ -8,6 +12,12 @@ class Disc(object):
         self.initial_pos = pos
         self.pos = pos
         self.power = power
+        if self.power < 30:
+            self.loft -= 1.5
+        elif self.power < 60:
+            self.loft -= 1
+        elif self.power < 85:
+            self.loft -= .5
         self.speed = self.base_speed * self.power * .01
         self.angle = radians(angle)
         self.pull_angle = self.angle - (self.pull * 1.5)
@@ -19,6 +29,7 @@ class Disc(object):
         self.peaked = False
         self.landed = False
         self.collided = False
+        self.rattled = False
         
                
     @property
@@ -31,8 +42,9 @@ class Disc(object):
         self.pos = (self.pos[0] + vx, self.pos[1] - vy)
         
     
-    def update(self, basket, obstacles):
-        obstacles = obstacles
+    def update(self, hole):
+        screen_rect = pg.display.get_surface().get_rect()
+        obstacles = hole.obstacles
         int_pos = self.int_pos
         
         if not self.landed:
@@ -42,12 +54,12 @@ class Disc(object):
                 self.landed = True
                        
             for item in obstacles:
-                if item.rect.collidepoint(int_pos):
+                if item.disc_collider.collidepoint(int_pos):
                     if self.altitude <= item.height:
                         obj_dist = hypot(item.rect.centerx - self.initial_pos[0],
-                                                          item.rect.centery - self.initial_pos[1])
+                                                  item.rect.centery - self.initial_pos[1])
                         disc_dist = hypot(int_pos[0] - self.initial_pos[0],
-                                                          int_pos[1] - self.initial_pos[1])
+                                                   int_pos[1] - self.initial_pos[1])
                         if obj_dist > disc_dist:
                             self.collided = True
                             self.speed = self.base_speed * self.power * .004
@@ -67,12 +79,13 @@ class Disc(object):
                     self.altitude += .0325        
             else:
                 self.altitude -= .025
+            old_pos = self.pos
             self.move()
-            
-            if basket.rect.collidepoint(self.int_pos):
-                print("Chains rattled")  
-            
-    def display(self, surface, trailing):
+            if not screen_rect.collidepoint(self.pos):
+                print "Out of Bounds"
+                self.pos = old_pos
+                
+    def draw(self, surface):
         pg.draw.circle(surface, pg.Color(self.color),
                               self.int_pos, max((int(self.altitude), 4)))
 
@@ -87,7 +100,7 @@ class Cupid(Disc):
     name = "Cupid"
     tagline = "A long approach disc with good loft" 
     def __init__(self, pos, power, angle):
-        super(Cupid, self).__init__(6.5, 4, .05, .15, "deeppink", pos, power, angle)       
+        super(Cupid, self).__init__(5, 4, .05, .15, "deeppink", pos, power, angle)       
         
 class Donder(Disc):
     name = "Donder"
@@ -117,7 +130,7 @@ class Blitzen(Disc):
     name  = "Blitzen"
     tagline = "A driver that finishes left"
     def __init__(self, pos, power, angle):
-        super(Blitzen, self).__init__(12.5, 4, .2, .3, "blue", pos, power, angle)
+        super(Blitzen, self).__init__(12.5, 4, .1, .3, "blue", pos, power, angle)
         
 class Dancer(Disc):
     name = "Dancer"

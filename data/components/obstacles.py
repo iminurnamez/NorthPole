@@ -32,7 +32,10 @@ class Obstacle(object):
 class Tree(Obstacle):
     def __init__(self, lefttop, course):
         super(Tree, self).__init__("tree", lefttop, (11, 27), (3, 4))
+        self.height = 7
         course.obstacles.append(self)
+        self.disc_collider = pg.Rect(self.rect.left + 8,
+                                                 self.rect.top + 2, 9, 29)
     
     def collide_with_boarder(self, boarder):
         boarder.crash(45)
@@ -165,9 +168,10 @@ class FinishLine(object):
         
 class DiscBasket(Obstacle):
     def __init__(self, lefttop, course):
-        super(DiscBasket, self).__init__("discbasket", lefttop, (6, 4), (21, 16))
+        super(DiscBasket, self).__init__("discbasket", lefttop, (16, 30), (1, 2))
         course.basket = self
-        course.obstacles.append(self)
+        self.disc_collider = pg.Rect(self.rect.left + 6, self.rect.top + 5, 21, 17)
+        
 
 class TeeBox(object):
     def __init__(self, lefttop, course):
@@ -175,4 +179,15 @@ class TeeBox(object):
         self.rect = self.image.get_rect(topleft=lefttop)
         course.teebox = self
         
-        
+    def display(self, surface):
+        surface.blit(self.image, self.rect)
+
+class TeeBoxVert(object):
+    def __init__(self, lefttop, course):
+        self.image = prepare.GFX["teeboxvert"]
+        self.rect = self.image.get_rect(topleft=lefttop)
+        course.teebox = self 
+
+    def display(self, surface):
+        surface.blit(self.image, self.rect)
+         

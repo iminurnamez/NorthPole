@@ -15,10 +15,15 @@ SCREEN = pg.display.set_mode(SCREEN_SIZE)
 SCREEN_RECT = SCREEN.get_rect()
 
 #Resource loading (Fonts and music just contain path names).
+DGCOURSE = tools.load_golf_holes(os.path.join("resources", "dgcourse"))
+COURSES = tools.load_golf_holes(os.path.join("resources", "courses"))
 FONTS = tools.load_all_fonts(os.path.join("resources", "fonts"))
 MUSIC = tools.load_all_music(os.path.join("resources", "music"))
 SFX   = tools.load_all_sfx(os.path.join("resources", "sound"))
 GFX   = tools.load_all_gfx(os.path.join("resources", "graphics"))
+
+# pre-transforming images
+GFX["teeboxvert"] = pg.transform.rotate(GFX["teebox"], 90)
 pics = [GFX["firework" + str(i)] for i in range(1, 15)]
 pics2 = [GFX["firework_ring" + str(i)] for i in range(1, 15)]
 for index, pic in enumerate(pics, 1):

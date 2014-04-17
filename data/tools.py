@@ -4,6 +4,7 @@ for States.  Also contained here are resource loading functions.
 """
 
 import os
+import json
 import pygame as pg
 from .components import players
 
@@ -162,6 +163,15 @@ def load_all_music(directory, accept=(".wav", ".mp3", ".ogg", ".mdi")):
             songs[name] = os.path.join(directory, song)
     return songs
 
+def load_golf_holes(directory, accept=(".json")):
+    holes = {}
+    for hole in os.listdir(directory):
+        name, ext = os.path.splitext(hole)
+        if ext.lower() in accept:
+            with open(os.path.join(directory, hole), "r") as f:
+                holes[name] = json.load(f)
+    return holes
+            
 
 def load_all_sfx(directory, accept=(".wav", ".mp3", ".ogg", ".mdi")):
     """Load all sfx of extensions found in accept.  Unfortunately it is

@@ -1,3 +1,5 @@
+import pygame as pg
+
 
 class PowerMeter(object):
     def __init__(self, lefttop, callback=None):
@@ -21,18 +23,21 @@ class PowerMeter(object):
  
     def interrupt(self):
         if self.action is None:
-            self.level = 0.0
-            self.action = self.fill_meter
+            if self.level > 0:
+                self.level = 0.0
+            else:
+                self.action = self.fill_meter
         else:
             self.action = None
             if self.callback is not None:
                 self.callback()
+
          
     def update(self):
         if self.action is not None:
             self.action()
  
-    def display(self, surface):
+    def draw(self, surface):
         self.surface.fill(pg.Color("gray1"))
         bar = pg.Rect((0, 0), (int(self.level), 10))
         bar_color = (int(255 - (self.level * 2.5)), int(2.5 * self.level), 0)                                  
