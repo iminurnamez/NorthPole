@@ -20,8 +20,12 @@ class Golfing(tools._State):
        
     def startup(self, persistant):   
         self.screen_rect = pg.display.get_surface().get_rect()
-        hole_items = prepare.DGCOURSE[persistant["hole"]]
-        self.hole = golfhole.DiscGolfHole(hole_items)
+        #hole_items = prepare.DGCOURSE[persistant["hole"]]
+        #self.hole = golfhole.DiscGolfHole(hole_items)
+        
+        self.holes = iter([golfhole.DiscGolfHole(x) for x in prepare.DGCOURSE.values()])
+        self.hole = next(self.holes)
+        
         self.player = persistant["player"]
         self.golfer = golfer.Golfer(self.hole.teebox.rect.center)
         self.power_meter = PowerMeter((self.screen_rect.centerx - 50,
@@ -66,7 +70,14 @@ class Golfing(tools._State):
                 print("Chains rattled")
                 prepare.SFX["chain"].play()
                 pg.time.delay(1500)
-                self.done = True 
+                #self.done = True 
+                try:
+                    self.hole = next(self.holes)
+                    self.golfer.rect.center = self.hole.teebox.rect.center
+                except StopIteration:
+                    self.done = True
+                
+                
                 # TODO add score
         
         self.draw(surface)

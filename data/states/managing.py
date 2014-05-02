@@ -206,7 +206,7 @@ class Managing(tools._State):
             elif event.key == pg.K_d:
                 self.next = "GOLFING"
                 self.persist["player"] = self.player
-                self.persist["hole"] = "dghole7"
+                self.persist["hole"] = "fiascocuzuncwillloseeverytime"
                 self.done = True
             elif event.key == pg.K_DOWN:
                 if self.fps > 20:
