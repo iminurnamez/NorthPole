@@ -11,6 +11,7 @@ class MountainGuide(tools._State):
         self.image = prepare.GFX["mtkringleguide"]
         center_point = pg.display.get_surface().get_rect().center
         self.image_rect = self.image.get_rect(center=center_point)
+        self.cursor = prepare.GFX["canecursor"]
     
     def get_event(self, event):
         if event.type == pg.KEYDOWN:
@@ -19,8 +20,11 @@ class MountainGuide(tools._State):
     def update(self, surface, keys):
         surface.fill(pg.Color("white"))
         surface.blit(self.image, self.image_rect)
+        surface.blit(self.cursor, pg.mouse.get_pos())
         
     def startup(self, persistant):
+        pg.mouse.set_visible(False)
+        pg.mixer.music.fadeout(1500)
         self.__init__()
         self.player = persistant["player"] 
         return tools._State.startup(self, persistant)

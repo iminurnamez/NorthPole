@@ -8,16 +8,22 @@ class Fence(object):
     def __init__(self, lefttop):
         self.image = prepare.GFX["fence"]
         self.rect = self.image.get_rect(topleft=lefttop)
-            
-    def display(self, surface):
+        
+    def draw(self, surface):
         surface.blit(self.image, self.rect)
 
 class Cloud(object):
     def __init__(self, lefttop):
         self.image = choice([prepare.GFX["cloud1"]])
         self.rect = self.image.get_rect(topleft=lefttop)
+        self.pos = lefttop
+        self.distance = randint(2, 3)
         
-    def display(self, surface):
+    def move(self, x_offset):
+        self.pos = (self.pos[0] + (x_offset / float(self.distance)), self.pos[1])
+        self.rect.topleft = self.pos
+        
+    def draw(self, surface):
         surface.blit(self.image, self.rect)
         
 class Race(object):
@@ -57,33 +63,35 @@ class Race(object):
         
     def update(self):
         if self.racing:
-            self.clouds = [x for x in self.clouds if x.rect.right > 0]
+            self.clouds = [x for x in self.clouds if x.rect.right >= 0]
             for racer in self.racers:
                 racer.update(self)
             if self.racers:
                 lead = max([x.rect.right for x in self.racers])
                 if lead >= self.screen_rect.width - 200:
                     x_offset = -(lead - (self.screen_rect.width - 200))        
-                    for item in it.chain(self.racers, self.fences, self.clouds):
+                    for item in it.chain(self.racers, self.fences):
                         item.rect.move_ip((x_offset, 0))
                     self.finish_rect.move_ip((x_offset, 0)) 
+                    for cloud in self.clouds:
+                        cloud.move(x_offset)
                     self.dist_travelled += -x_offset
             else:
                 self.done = True
                 self.racing = False                
         self.ticks += 1
             
-    def display(self, surface):
+    def draw(self, surface):
         surface.fill(pg.Color("black"))
         pg.draw.rect(surface, (73, 37, 25), self.track_rect)
-        pg.draw.rect(surface, pg.Color("darkgreen"), self.grass_rect)
+        pg.draw.rect(surface, pg.Color(224, 255, 255), self.grass_rect)
         pg.draw.rect(surface, pg.Color("lightblue"), self.sky_rect)
-        for cloud in [x for x in self.clouds if x.rect.left <= self.screen_rect.right]:
-            cloud.display(surface)
+        for cloud in sorted([x for x in self.clouds if x.rect.left <= self.screen_rect.right], reverse=True):
+            cloud.draw(surface)
         pg.draw.rect(surface, (73, 37, 25), self.map_rect)
         pg.draw.rect(surface, pg.Color("white"), self.finish_rect)
         for fence in self.fences:
-            fence.display(surface)
+            fence.draw(surface)
         for deer in self.racers:
             surface.blit(deer.surface, deer.rect)
             pg.draw.rect(surface, pg.Color(deer.color), 
@@ -100,13 +108,13 @@ class Race(object):
         for winner in self.results:
             pg.draw.rect(surface, pg.Color(winner.color), (10, top, 10, 10))
             winner.name_label.rect.topleft = (25, top)
-            winner.name_label.display(surface)    
+            winner.name_label.draw(surface)    
             top += 20
         if len(self.results) < 4:
             for racer in ranked[:4 - len(self.results)]:
                 pg.draw.rect(surface, pg.Color(racer.color), (10, top, 10, 10))
                 racer.name_label.rect.topleft = (25, top)
-                racer.name_label.display(surface)
+                racer.name_label.draw(surface)
                 top += 20
             
             

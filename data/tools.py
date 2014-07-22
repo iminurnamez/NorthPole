@@ -5,6 +5,7 @@ for States.  Also contained here are resource loading functions.
 
 import os
 import json
+from collections import OrderedDict
 import pygame as pg
 from .components import players
 
@@ -111,10 +112,10 @@ class _State(object):
         Must be overloaded in children."""
         pass
 
-    def startup(self, persistant):
-        """Add variables passed in persistant to the proper attributes and
+    def startup(self, persistent):
+        """Add variables passed in persistent to the proper attributes and
         set the start time of the State to the current time."""
-        self.persist = persistant
+        self.persist = persistent
 
     def cleanup(self):
         """Add variables that should persist to the self.persist dictionary.
@@ -164,7 +165,7 @@ def load_all_music(directory, accept=(".wav", ".mp3", ".ogg", ".mdi")):
     return songs
 
 def load_golf_holes(directory, accept=(".json")):
-    holes = {}
+    holes = OrderedDict()
     for hole in os.listdir(directory):
         name, ext = os.path.splitext(hole)
         if ext.lower() in accept:

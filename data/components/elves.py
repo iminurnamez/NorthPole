@@ -24,11 +24,11 @@ class Elf(object):
         self.max_energy = 1000.0  #random.randint(800, 1000)
         self.max_cheer = 1000.0  #random.randint(800, 1000)
         self.max_food = 1000.0  #random.randint(800, 1000)
-        
+        self.max_cavities = 1000.0
         self.energy = self.max_energy * .2
         self.cheer = self.max_cheer * .5
         self.food = self.max_food * .5
-       
+        self.cavities = self.max_cavities
         self.strength = random.randint(50, 100)
         #self.stats = {"Wits": , # + skill acquisition
         #                   "Mirth": ,  #max_cheer
@@ -105,7 +105,8 @@ class Elf(object):
             self.image = next(self.images[self.state][(self.x_velocity, self.y_velocity)])
         elif not world.ticks % 5 and self.state == "Idle":
             self.image = next(self.images["Idle"])
-    def display(self, surface):
+            
+    def draw(self, surface):
         if self.state in {"Travelling", "Hauling", "Logging", "Mining", "Idle"}:
             surface.blit(self.image, self.rect)           
         
@@ -126,13 +127,16 @@ class Elf(object):
         the_world = world
         grid = world.grid
         
-        depth = (abs(self.goal[0] - self.index[0]) + abs(self.goal[1] - self.index[1])) * 2
+        #depth = (abs(self.goal[0] - self.index[0]) + abs(self.goal[1] - self.index[1])) * 2
         neighbors = []
         visited = set()
         neighbors.append([self.index])
         visited.add(self.index)
         goal_found = False
-        for i in range(1, depth + 1):
+        i = 0
+        while not goal_found:
+        #for i in range(1, depth + 1):
+            i += 1
             more_neighbors = set()
             for a_neighbor in neighbors[i - 1]:
                 for next_neighbor in grid[a_neighbor].get_open_neighbors(the_world):
@@ -151,7 +155,13 @@ class Elf(object):
             neighbors.append(more_neighbors)
             if goal_found:
                 break
-
+            #just in case
+            if i > 1000:
+                print "Depth greater than 1000 in find_path"
+                print self.name
+                print self.destination
+                print self.venue
+                break            
         reverse_route = []
         best_landing_spot = list(neighbors[len(neighbors) - 1])[0]
         for neighbor in neighbors[len(neighbors) - 1]:
@@ -175,7 +185,7 @@ class Elf(object):
                 new_landing_spot = candidates[0]
             
             except IndexError:
-                print "Job: {}".format(self.job.name)
+                print "Job: {}".format(self.job)
                 print "Index: {}".format(self.index)
                 print "Goal: {}".format(self.goal)
                 print "Venue: {}".format(self.venue.name)
@@ -201,13 +211,25 @@ class Elf(object):
             i += 1
         return reverse_route[::-1]
                 
+    def assign_job(self, building):
+        if self.job is not None:
+            self.job.assigned.remove(self)
+        self.job = building
+        self.job.assigned.append(self)
+        self.cargo = None
+        
+        
     def work_check(self, world):
         if (self.energy < 200 or
                     self.food < 150 or
                     self.cheer < 100):
             self.state = "Idle"
-            self.job.workers.remove(self)
-            self.index = self.job.entrance
+            try:
+                self.job.workers.remove(self)
+            except ValueError as e:
+                print e
+                print "Elf not in elf.job.workers"
+            self.index = self.job.exit
             self.rect.center = world.grid[self.index].rect.center
             return True
     
@@ -279,19 +301,16 @@ class Elf(object):
             self.cheer -= 1    
 
     def update(self, world):
-        if self.energy < 1:
-            self.energy = 1
-        if self.cheer < 1:
-            self.cheer = 1
-        if self.food < 1:
-            self.food = 1
-
+        self.energy = max(1, min(self.energy, self.max_energy))
+        self.cheer = max(1, min(self.cheer, self.max_cheer))
+        self.food = max(1, min(self.food, self.max_food))
      
         if self.state == "Idle":
-            if (self.energy > self.max_energy * .7 and 
-                            self.food > self.max_food * .7 and
-                            self.cheer > self.max_cheer * .7 and
-                            self.job.has_worker_vacancies()):
+            if (self.energy > self.max_energy * .7 
+                        and self.food > self.max_food * .7
+                        and self.cheer > self.max_cheer * .7
+                        and self.cavities > self.max_cavities * .3
+                        and ((self.job is not None) and self.job.has_worker_vacancies())):
                 self.state = "Travelling"
                 self.next_state = "Working"
                 self.venue = self.job
@@ -303,16 +322,20 @@ class Elf(object):
             else:    
                 desires = {"Resting": (self.max_energy / self.energy),
                                 "Merrymaking": (self.max_cheer / self.cheer),
-                                "Eating": (self.max_food / self.food)}           
+                                "Eating": (self.max_food / self.food),
+                                "Cavities": (self.max_cavities / self.cavities)}           
                 top_desires = iter(sorted(desires, key=desires.get, reverse=True))
                 top_desire = next(top_desires)           
                 open_cheer_buildings = [x for x in world.cheer_buildings if x.has_patron_vacancies()]
                 open_food_buildings = [x for x in world.food_buildings if x.has_patron_vacancies()]
                 open_rest_buildings = [x for x in world.rest_buildings if x.has_patron_vacancies()]
+                open_dental_buildings = [x for x in world.dental_buildings if x.has_patron_vacancies()]
                 desire_venues = {"Resting": None,
-                                           "Working": self.job,
                                            "Merrymaking": None,
-                                           "Eating": None}
+                                           "Eating": None,
+                                           "Cavities": None}
+                if open_dental_buildings and self.cavities < self.max_cavities * .8:
+                    desire_venues["Cavities"] = random.choice(open_dental_buildings)
                 if open_rest_buildings and self.energy < self.max_energy:
                     desire_venues["Resting"] = random.choice(open_rest_buildings)
                 if open_cheer_buildings and self.cheer < self.max_cheer:
@@ -320,7 +343,7 @@ class Elf(object):
                 if open_food_buildings and self.food < self.max_food:
                     desire_venues["Eating"] = random.choice(open_food_buildings)
                 if not any([desire_venues["Resting"], desire_venues["Merrymaking"],
-                                 desire_venues["Eating"]]):
+                                 desire_venues["Eating"], desire_venues["Cavities"]]):
                     return                             
                 while True:
                     if desire_venues[top_desire]:
@@ -336,15 +359,15 @@ class Elf(object):
                 self.venue = desire_venues[top_desire]
                 self.venue.en_route_patrons.append(self)
                 self.goal = self.venue.entrance
-            self.path = iter(self.find_path(world))
-            self.destination = next(self.path)
+                self.path = iter(self.find_path(world))
+                self.destination = next(self.path)
             
         elif self.state == "Resting":
-            if self.energy > self.max_energy:
+            if self.energy >= self.max_energy:
                 self.energy = self.max_energy
                 self.state = "Idle"
                 self.venue.patrons.remove(self)
-                self.index = self.venue.entrance
+                self.index = self.venue.exit
                 self.rect.center = world.grid[self.index].rect.center
             else:
                 if self.energy < self.max_energy / 3:
@@ -354,6 +377,14 @@ class Elf(object):
                 else:
                     self.energy += 3
                 
+        elif self.state == "Cavities":
+            if self.cavities >= self.max_cavities:
+                self.cavities = self.max_cavities
+                self.state ="Idle"
+                self.venue.patrons.remove(self)
+                self.index= self.venue.exit
+                self.rect.center = world.grid[self.index].rect.center
+                
         elif self.state == "Working":
             self.do_work(world)
         
@@ -362,7 +393,7 @@ class Elf(object):
                 self.venue.patrons.remove(self)
                 self.food = self.max_food
                 self.state = "Idle"
-                self.index = self.venue.entrance
+                self.index = self.venue.exit
                 self.rect.center = world.grid[self.index].rect.center             
             else:
                 food_value = 0
@@ -381,13 +412,14 @@ class Elf(object):
                 if not cookies or milk:
                     food_value += .2
                 self.food += food_value
+                self.cavities -= .2
         
         elif self.state == "Merrymaking":
             if self.cheer >= self.max_cheer:
                 self.venue.patrons.remove(self)
                 self.cheer = self.max_cheer
                 self.state = "Idle"
-                self.index = self.venue.entrance
+                self.index = self.venue.exit
                 self.rect.center = world.grid[self.index].rect.center
             else:
                 self.venue.give_cheer(self)
@@ -400,8 +432,10 @@ class Elf(object):
             self.venue.wood -= .01
             self.energy -= 1
             self.cheer -= 1
-
-            if self.cargo[1] > self.strength:
+            if (self.energy < 200
+                 or self.food < 150
+                 or self.cheer < 100
+                 or self.cargo[1] > self.strength):
                 self.venue.workers.remove(self)
                 self.state = "Travelling"
                 self.next_state = "Working"
@@ -446,15 +480,22 @@ class Elf(object):
                     self.path = iter(self.find_path(world))
                     self.destination = next(self.path)
             elif self.rect.topleft == world.grid[self.destination].rect.topleft:
-                self.destination = next(self.path)    
+                try:
+                    self.destination = next(self.path)    
+                except StopIteration as e:
+                    print "No next destination in PATH!"
+                    print e
+                    print self.destination
+                    print self.venue
             else:
                 self.travel(world) 
         
         elif self.state == "Travelling":
             if self.rect.topleft == world.grid[self.goal].rect.topleft:
                 self.index = self.goal
-                if self.next_state in ["Working", "Logging", "Mining"]:
-                    self.venue.workers.append(self)
+                if self.next_state in ["Working", "Logging"]:
+                    if self not in self.venue.workers:
+                        self.venue.workers.append(self)
                     self.venue.en_route_workers.remove(self)
                 else:
                     self.venue.patrons.append(self)
@@ -462,12 +503,20 @@ class Elf(object):
                         self.venue.en_route_patrons.remove(self)
                     except ValueError as e:
                         print e
-                        print self.job.name
-                        print self.venue.name
-                        print self.next_state                        
+                        print "elf not in venue.patrons"
+                        print "job: ", self.job.name
+                        print "venue: ", self.venue.name
+                        print "next state: ", self.next_state                        
                 self.state = self.next_state
             elif self.rect.topleft == world.grid[self.destination].rect.topleft:
-                self.destination = next(self.path)    
+                try:
+                    self.destination = next(self.path)    
+                except StopIteration as e:
+                    print e
+                    print "no next destination in path"
+                    print self.destination
+                    print self.venue
+                    
             else:
                 self.travel(world)  
 
@@ -505,8 +554,14 @@ class Reindeer(object):
     def update(self, world):
         for worker in self.barn.workers:
             if self.barn.inputs["Moss"] >= .01:
-                self.barn.outputs["Milk"] += .02
+                self.barn.outputs["Milk"] += .01
                 self.barn.inputs["Moss"] -= .01
+            if self.barn.inputs["Carrot"] >= .005:
+                self.barn.inputs["Carrot"] -= .005
+                if not random.randint(0, 10000) and len(self.barn.reindeers) < 10:
+                    self.barn.reindeers.append(Reindeer(self.barn.rect.center,
+                                                                          random.randint(1, 10),
+                                                                          self.barn))               
         if not random.randint(0, 10):
             self.velocity = random.choice(self.velocities)
             self.image = next(self.images[self.velocity])
@@ -515,7 +570,7 @@ class Reindeer(object):
         self.move(self.velocity)
         
         
-    def display(self, surface):
+    def draw(self, surface):
         surface.blit(self.image, self.rect)    
      
         

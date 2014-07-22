@@ -12,6 +12,7 @@ class DeerRacing(tools._State):
         super(DeerRacing, self).__init__()
         self.next = "RACINGRESULTS"
         self.gallop_sound = prepare.SFX["gallop"] 
+    
     def startup(self, persistant):
         self.race = races.Race(persistant["racers"], persistant["distance"],
                                          persistant["player"])
@@ -30,6 +31,6 @@ class DeerRacing(tools._State):
             self.gallop_sound.stop()
             self.done = True
         self.race.update()
-        self.race.display(surface)
+        self.race.draw(surface)
     
     

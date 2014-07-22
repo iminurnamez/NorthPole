@@ -1,8 +1,12 @@
 from math import radians, sin, cos, hypot
 from random import uniform
 import pygame as pg
+from .. import prepare
 
 class Disc(object):
+    name_font = pg.font.Font(prepare.FONTS["weblysleekuili"], 16)
+    kind_font = pg.font.Font(prepare.FONTS["weblysleekuisl"], 14)
+    reg_font = pg.font.Font(prepare.FONTS["weblysleekuil"], 12)
     def __init__(self, speed, loft, pull, fade, color, pos, power, angle):
         self.base_speed = speed * .1
         self.loft = loft
@@ -31,7 +35,8 @@ class Disc(object):
         self.collided = False
         self.rattled = False
         
-               
+      
+    
     @property
     def int_pos(self):
         return (int(self.pos[0]), int(self.pos[1]))
@@ -92,54 +97,63 @@ class Disc(object):
 
 class Rudolph(Disc):
     name = "Rudolph"
+    kind = "Putter"
     tagline = "This putter guides the way straight to the chains"
     def __init__(self, pos, power, angle):
         super(Rudolph, self).__init__(6, 1, 0, .1, "red",  pos, power, angle)
         
 class Cupid(Disc):
     name = "Cupid"
+    kind = "Approach"
     tagline = "A long approach disc with good loft" 
     def __init__(self, pos, power, angle):
-        super(Cupid, self).__init__(5, 4, .05, .15, "deeppink", pos, power, angle)       
+        super(Cupid, self).__init__(6, 4, .05, .15, "deeppink", pos, power, angle)       
         
 class Donder(Disc):
     name = "Donder"
+    kind = "Mid-range"
     tagline = "A basic mid-range disc"
     def __init__(self, pos, power, angle):
         super(Donder, self).__init__(9, 3, .1, .2, "lightblue",  pos, power, angle)
 
 class Vixen(Disc):
     name = "Vixen"
+    kind = "Mid-Range"
     tagline = "A mid-range disc with wicked curves"
     def __init__(self, pos, power, angle):
         super(Vixen, self).__init__(9, 3, .45, .6, "maroon",  pos, power, angle)
         
 class Dasher(Disc):
     name = "Dasher"
+    kind = "Frwy Driver"
     tagline = "A fairway driver with minimal movement"
     def __init__(self, pos, power, angle):
         super(Dasher, self).__init__(10, 3.5, .1, .2, "green",  pos, power, angle)
         
 class Prancer(Disc):
     name = "Prancer"
+    kind = "Frwy Driver"
     tagline = "A fairway driver with good loft and moderate movement"
     def __init__(self, pos, power, angle):
         super(Prancer, self).__init__(10, 4, .3, .3, "orange",  pos, power, angle)
         
 class Blitzen(Disc):
     name  = "Blitzen"
+    kind = "Driver"
     tagline = "A driver that finishes left"
     def __init__(self, pos, power, angle):
         super(Blitzen, self).__init__(12.5, 4, .1, .3, "blue", pos, power, angle)
         
 class Dancer(Disc):
     name = "Dancer"
+    kind = "Driver"
     tagline = "A driver with lots of movement"
     def __init__(self, pos, power, angle):
         super(Dancer, self).__init__(11.5, 4, .35, .35, "purple",  pos, power, angle)
         
 class Comet(Disc):
     name = "Comet"
+    kind = "Dist Driver"
     tagline = "A stellar distance driver"
     def __init__(self, pos, power, angle):
-        super(Comet, self).__init__(13, 4, .025, .1, "yellow",  pos, power, angle)
+        super(Comet, self).__init__(13, 4, .025, .1, "turquoise3",  pos, power, angle)

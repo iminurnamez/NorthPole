@@ -4,8 +4,7 @@ import pygame as pg
 from .. import prepare
             
 class Decoration(object):
-    def __init__(self, name, index, world, size, tile_map):
-        self.name = name
+    def __init__(self, index, world, size, tile_map):
         self.index = index
         self.rect = pg.Rect(world.grid[self.index].rect.topleft, size)
         self.tile_map = tile_map
@@ -21,12 +20,14 @@ class Decoration(object):
                 column -= 1
             row += 1
             column = len(self.tile_map[0]) - 1
+        world.decorations.append(self) 
        
     def move(self, offset):
         self.rect.move_ip(offset)
         self.cheer_rect.move_ip(offset)
+        
             
-    def display(self, surface):
+    def draw(self, surface):
         surface.blit(self.image, self.rect)
     
     def update(self, world):
@@ -37,12 +38,45 @@ class Decoration(object):
                 if elf.cheer > elf.max_cheer:
                     elf.cheer = elf.max_cheer
 
+                    
+class Snowman(Decoration):
+    footprint = (1, 1)
+    name = "Snowman"
+    size = (32, 32)
+    def __init__(self, index, world):                
+        tile_map = ["XX",
+                          "SX"]
+        super(Snowman, self).__init__(index, world,
+                                                      (32, 32), tile_map)     
+        self.image = prepare.GFX["snowman"]
+        self.cheer_rect = pg.Rect(self.rect.left - 16, self.rect.top, 48, 48)
+        self.cheer_quality = .05
+        
+    def move(self, offset):
+        self.rect.move_ip(offset)
+        self.cheer_rect.move_ip(offset)
+              
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+        
+    def update(self, world):
+        elves = world.elves
+        for elf in [x for x in elves if x.state in {"Travelling",
+                                                                  "Hauling"}]:
+            if elf.rect.colliderect(self.cheer_rect):
+                elf.cheer += self.cheer_quality
+                if elf.cheer > elf.max_cheer:
+                    elf.cheer = elf.max_cheer
+            
+            
 class XmasTree(Decoration):
     footprint = (1, 1)
+    name = "Xmas Tree"
+    size = (32, 32)
     def __init__(self, index, world):                
         tile_map = ["XX",
                           "TX"]
-        super(XmasTree, self).__init__("Xmas Tree", index, world,
+        super(XmasTree, self).__init__(index, world,
                                                       (32, 32), tile_map)     
         self.image = prepare.GFX["xmastree"]
         self.light_cycle = it.cycle([prepare.GFX["treelights" + str(x)] for
@@ -53,19 +87,19 @@ class XmasTree(Decoration):
         self.cheer_rect = pg.Rect(self.rect.left - 16, self.rect.top, 48, 48)
         self.cheer_quality = .1
         
-    def move(self):
+    def move(self, offset):
         self.rect.move_ip(offset)
         self.cheer_rect.move_ip(offset)
         self.lights_rect.move_ip(offset)
         
-    def display(self, surface):
+    def draw(self, surface):
         surface.blit(self.image, self.rect)
         surface.blit(self.lights, self.lights_rect)
         
     def update(self, world):
         elves = world.elves
         for elf in [x for x in elves if x.state in {"Travelling",
-                                                                           "Hauling"}]:
+                                                                  "Hauling"}]:
             if elf.rect.colliderect(self.cheer_rect):
                 elf.cheer += self.cheer_quality
                 if elf.cheer > elf.max_cheer:
@@ -75,21 +109,24 @@ class XmasTree(Decoration):
                    
 class WavySanta(Decoration):
     footprint = (2, 1)
+    size = (32, 64)
+    name = "Wavy Santa"
     def __init__(self, index, world):
         tile_map = ["XX",
                           "XX",
                           "XX",
                           "SS"]
-        super(WavySanta, self).__init__("Wavy Santa", index, world, (32, 64), tile_map)
+        super(WavySanta, self).__init__(index, world, (32, 64), tile_map)
         self.images = it.cycle([prepare.GFX["wavy1"], prepare.GFX["wavy2"]])
         self.image = next(self.images)        
         self.cheer_rect = pg.Rect(self.rect.left - 48, self.rect.top, 128, 128)
-        self.cheer_quality = .15        
+        self.cheer_quality = .15
+               
     
     def update(self, world):
         elves = world.elves
         for elf in [x for x in elves if x.state in {"Travelling",
-                                                                           "Hauling"}]:
+                                                                  "Hauling"}]:
             if elf.rect.colliderect(self.cheer_rect):
                 elf.cheer += self.cheer_quality
                 if elf.cheer > elf.max_cheer:
@@ -100,6 +137,8 @@ class WavySanta(Decoration):
             
 class PyroBox(Decoration):
     footprint = (1, 1)
+    size = (32, 32)
+    name = "Fireworks"
     colors = [
                   #"dodgerblue4",
                   #"orangered",
@@ -121,7 +160,7 @@ class PyroBox(Decoration):
     def __init__(self, index, world):                
         tile_map = ["XX",
                           "BX"]
-        super(PyroBox, self).__init__("Fireworks", index, world, (32, 32),
+        super(PyroBox, self).__init__(index, world, (32, 32),
                                                     tile_map)     
         self.image = prepare.GFX["pyrobox"]
         self.cheer_rect = pg.Rect(0, 0, 320, 320)
@@ -130,14 +169,17 @@ class PyroBox(Decoration):
         self.fireworks = []
         self.cheer_quality = .35
         
-    def move(self):
+    def move(self, offset):
         self.rect.move_ip(offset)
+        self.cheer_rect.move_ip(offset)
+        for firework in self.fireworks:
+            firework.move(offset)
 
         
-    def display(self, surface):
+    def draw(self, surface):
         surface.blit(self.image, self.rect)
         for firework in self.fireworks:
-            firework.display(surface)
+            firework.draw(surface)
         
         
     def update(self, world):
@@ -192,31 +234,32 @@ class Firework(object):
         self.pyro_box = pyro_box
         self.exploded = False
         self.done = False
+        self.rect = pg.Rect(0, 0, 2, 2)
         
         
-    def display(self, surface):
+    def draw(self, surface):
         if self.delay > 0:
             return
         if not self.exploded: 
-            if not self.covered:        
-                pg.draw.rect(surface, pg.Color(self.color), self.rocket_rect)
+            pg.draw.rect(surface, pg.Color(self.color), self.rocket_rect)
         else:
             surface.blit(self.image, self.rect)            
             
+    def move(self, offset):
+        self.rect.move_ip(offset)
+        self.rocket_rect.move_ip(offset)
+        self.x_pos += offset[0]
+        self.y_pos += offset[1]
+        self.altitude += offset[1]
+        
+        
     def update(self, world):
         self.delay -= 1
         if self.done:
             self.pyro_box.fireworks.remove(self)
         if self.delay > 0:
             return
-        if not self.exploded:
-            self.covered = False
-            for item in [x for x in it.chain(world.trees, world.buildings,
-                              world.decorations) if x.rect.bottom < self.start_y]:
-                if item.rect.collidepoint(self.x_pos, self.y_pos):
-                    self.covered = True
-                    break
-        
+        if not self.exploded:        
             if self.y_pos <= self.altitude:
                 self.exploded = True
                 self.image = next(self.images)

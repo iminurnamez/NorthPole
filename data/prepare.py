@@ -42,6 +42,12 @@ for index, pic in enumerate(pics2, 1):
          surf.set_colorkey((0,0,0, 255))
          pg.transform.threshold(surf, pic, (0,0,0,255), (0,0,0,0), pg.Color(color))
          GFX[color + "firework_ring" + str(index)] = surf
-     
 
+         
+for light_color in ["blue", "red", "purple", "orange", "green", "yellow"]:
+     surf = pg.Surface(GFX["runwaylight"].get_rect().size).convert()
+     surf.set_colorkey((0,0,0, 255))
+     pg.transform.threshold(surf, GFX["runwaylight"], (0,0,0,255), (0,0,0,0), pg.Color(light_color))
+     GFX["runwaylight" + light_color] = surf
+     
 PLAYER = players.Player()

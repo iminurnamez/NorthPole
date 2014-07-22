@@ -10,7 +10,9 @@ from . import prepare,tools
 from .states import introsplash, managing, boarding, mountainguide
 from .states import betting, deerracing, raceresults
 from .states import elf_popup, building_popup, instructionsplash, bet_instructions
-from .states import building_placement, golfing
+from .states import building_placement, golfing, building_type_selection, building_selection
+from .states import elf_assignment, message_window, elf_selector, mine_construction, present_drop
+
 
 def main():
     """Add states to control here."""
@@ -19,16 +21,22 @@ def main():
     state_dict = {"INTROSPLASH": introsplash.IntroSplash(),
                          "INSTRUCTIONSPLASH": instructionsplash.InstructionSplash(),
                          "MANAGING": managing.Managing(),
+                         "ELFSELECTOR": elf_selector.ElfSelector(),
                          "ELFPOPUP": elf_popup.ElfPopup(),
+                         "ELFASSIGNMENT": elf_assignment.ElfAssignment(),
                          "BUILDINGPOPUP": building_popup.BuildingPopup(),
-                         #"BUILDINGSELECTION": building_selection.BuildingSelection(), 
+                         "MINEBUILD": mine_construction.MineConstruction(),
+                         "BUILDINGTYPESELECTION": building_type_selection.BuildingTypeSelection(), 
+                         "BUILDINGSELECTION": building_selection.BuildingSelection(),
                          "BUILDINGPLACEMENT": building_placement.BuildingPlacement(),
+                         "MESSAGEWINDOW": message_window.MessageWindow(),
                          "MOUNTAINGUIDE": mountainguide.MountainGuide(),
                          "BOARDING" : boarding.Boarding(),
                          "BETINSTRUCTIONS": bet_instructions.BettingSplash(),
                          "BETTING": betting.Betting(),
                          "DEERRACING": deerracing.DeerRacing(),
                          "RACINGRESULTS": raceresults.RaceResults(),
-                         "GOLFING": golfing.Golfing()}
+                         "GOLFING": golfing.Golfing(),
+                         "PRESENTDROP": present_drop.PresentDrop()}
     run_it.setup_states(state_dict, "INTROSPLASH")
     run_it.main()

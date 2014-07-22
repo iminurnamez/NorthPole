@@ -2,15 +2,15 @@ import pygame as pg
 
 
 class PowerMeter(object):
-    def __init__(self, lefttop, callback=None):
-        self.rect = pg.Rect(lefttop, (100, 10))
-        self.surface = pg.Surface(self.rect.size)
+    def __init__(self, middletop, callback=None):
+        self.surface = pg.Surface((100, 10))
+        self.rect = self.surface.get_rect(midtop=middletop)
         self.level = 0
         self.action = None
         self.callback = callback
        
     def fill_meter(self):
-        self.level += max(1, self.level / 20)
+        self.level += max(1.5, self.level / 20)
         if self.level >= 100.0:
             self.level = 100.0
             self.action = self.drain_meter
