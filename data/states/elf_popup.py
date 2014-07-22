@@ -36,13 +36,17 @@ class ElfPopup(tools._State):
         
     def get_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
-            if self.done_button.rect.collidepoint(event.pos):
+            if event.button == 1:
+                if self.done_button.rect.collidepoint(event.pos):
+                    self.next = "MANAGING"
+                    self.done = True            
+                elif self.assign_button.rect.collidepoint(event.pos):
+                    self.next = "ELFASSIGNMENT"
+                    self.done = True
+            elif event.button == 3:
                 self.next = "MANAGING"
-                self.done = True            
-            elif self.assign_button.rect.collidepoint(event.pos):
-                self.next = "ELFASSIGNMENT"
                 self.done = True
-            
+                
     def update(self, surface, keys):
         self.draw(surface)    
         

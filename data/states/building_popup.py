@@ -31,9 +31,12 @@ class BuildingPopup(tools._State):
         
     def get_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
-            if self.done_button.rect.collidepoint(event.pos):
-                self.done = True            
-    
+            if event.button == 1:
+                if self.done_button.rect.collidepoint(event.pos):
+                    self.done = True            
+            elif event.button == 3:
+                self.done = True
+                
     def update(self, surface, keys):
         self.draw(surface)    
         

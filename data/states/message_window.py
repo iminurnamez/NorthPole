@@ -36,9 +36,12 @@ class MessageWindow(tools._State):
     
     def get_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
-            if self.ok.rect.collidepoint(event.pos):
+            if event.button == 1:
+                if self.ok.rect.collidepoint(event.pos):
+                    self.done = True
+            elif event.button == 3:
                 self.done = True
-    
+                
     def update(self, surface, keys):
         self.draw(surface)
         
