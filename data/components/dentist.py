@@ -33,7 +33,7 @@ class DentistOffice(Building):
         self.drilling = max(0, self.drilling -1)
         if self.workers and self.patrons:
             for elf in self.patrons:
-                elf.cavities += .05 # TODO - should be elf skill
+                elf.cavities += .5 # TODO - should be elf skill
             if not world.ticks % 100:
                 self.drilling = 30
             if self.drilling:
