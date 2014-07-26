@@ -573,8 +573,7 @@ class Reindeer(object):
                 self.barn.inputs["Moss"] -= .01
             if self.barn.inputs["Carrot"] >= .005:
                 self.barn.inputs["Carrot"] -= .005
-                if not (random.randint(0, int(25000 * (1 - husbandry))) 
-                           and len(self.barn.reindeers) < 10):
+                if not random.randint(0, int(25000 * (1 - husbandry))) and len(self.barn.reindeers) < 10:
                     self.barn.reindeers.append(Reindeer(self.barn.rect.center,
                                                                           random.randint(1, 10),
                                                                           self.barn))               

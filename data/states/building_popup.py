@@ -155,12 +155,10 @@ class BuildingPopup(tools._State):
                                                              worker_title.rect.bottom + 5))
             worker_surf.set_colorkey(pg.Color("black"))
             self.blitters.append((worker_surf, workers_rect))
-
+            current_bottom = workers_rect.bottom
         if bmp:
-            if bmw:
-                top = workers_rect.bottom + 10
-            else:
-                top = current_bottom + 10
+            
+            top = current_bottom + 10
             patron_title = GLabel(self.labels, self.font, 16, "Patrons", "gray1",
                                             {"midtop": (self.popup.centerx, top)},
                                             "white")
@@ -211,8 +209,8 @@ class BuildingPopup(tools._State):
                                                             patron_title.rect.bottom + 10))
             patrons.set_colorkey(pg.Color("black"))
             self.blitters.append((patrons, patrons_rect))           
-            
-        top = self.popup.top + 150
+            current_bottom = patrons_rect.bottom
+        top = current_bottom + 20
         left = self.popup.left + 50
         spacer = 200
         if building.inputs:
