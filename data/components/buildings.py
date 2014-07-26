@@ -104,6 +104,10 @@ class BakeryTile(BuildingTile):
 class DentistOfficeTile(BuildingTile):
     def __init__(self, index, world):
         super(DentistOfficeTile, self).__init__(index, "Dentist's Office", "dentistoffice", world)
+
+class SchoolTile(BuildingTile):
+    def __init__(self, index, world):
+        super(SchoolTile, self).__init__(index, "Schoolhouse", "school", world)
         
 class PottingShed(BuildingTile):
     def __init__(self, index, world):
@@ -180,6 +184,11 @@ class Building(object):
         self.en_route_patrons = []
         self.outputs = {}
         self.inputs = {}
+        
+        if self.modes:
+            self.mode_cycle = it.cycle(self.modes)
+            self.mode = next(self.mode_cycle)
+        
         self.tiles = []
         column = len(self.tile_map[0]) - 1
         row = 0
@@ -234,6 +243,7 @@ class Warehouse(Building):
     footprint = (7, 6)
     size = (112, 112)
     name = "Warehouse"
+    modes = None
     def __init__(self, index, world):
         tile_map =  ["XXXXXXX",
                           "OOOOOOO",
@@ -272,6 +282,7 @@ class Tree(Building):
     footprint = (2, 1)
     size = (32, 32)
     name = "Tree"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XX",
                           "TX"]
@@ -301,6 +312,7 @@ class Ore(Building):
     footprint = (2, 1)
     size = (32, 32)
     name = "Iron Ore"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XX",
                           "TX"]
@@ -329,6 +341,7 @@ class Igloo(Building):
     footprint = (3, 3)
     size = (64, 48)
     name = "Igloo"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["OOOX",
                           "OOOX",
@@ -347,6 +360,7 @@ class House(Building):
     footprint = (4, 4)
     size = (64, 80)
     name = "House"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOOO",
@@ -387,6 +401,7 @@ class GingerbreadHouse(Building):
     footprint = (5, 4)
     size = (80, 96)
     name = "Gingerbread House"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XXXXX",
                            "XXXXX",
@@ -435,6 +450,7 @@ class Barn(Building):
     footprint = (7, 6)
     size = (112, 112)
     name = "Barn"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XXXXXXX",
                           "OOOOOOO",
@@ -485,6 +501,7 @@ class Bakery(Building):
     footprint = (4, 3)
     size = (64, 48)
     name = "Bakery"
+    modes = ["Cookies", "Carrot Cake"]
     def __init__(self, index, world):
         tile_map = ["OOOO",
                           "OOOO",
@@ -497,17 +514,21 @@ class Bakery(Building):
         self.inputs["Carrot"] = 0
         self.inputs["Sugar"] = 100
         self.max_workers = 2
-        self.modes = it.cycle(["Cookies", "Carrot Cake"])
-        self.mode = next(self.modes)
         self.windows = [Window((self.rect.left + 11, self.rect.top + 21),
                                              (51, 16))]
         
     def update(self, world):
-        for _ in self.workers:
+        for worker in self.workers:
             if self.mode == "Cookies":
                 if self.inputs["Sugar"] >= .01:
-                    self.outputs["Cookies"] += .02
+                    self.outputs["Cookies"] += .02 * worker.skills["Baking"] 
                     self.inputs["Sugar"] -= .01
+            elif self.mode == "Carrot Cake":
+                if (self.inputs["Sugar"] >= .005 and self.inputs["Carrots"] >= .01):
+                    self.outputs["Carrot Cake"] += .02 * worker.skills["Baking"]
+                    self.inputs["Sugar"] -= .005
+                    self.inputs["Carrot"] -= .01
+                        
         for window in self.windows:
             window.update(world)        
 
@@ -528,6 +549,7 @@ class MossFarm(Building):
     size = (64, 80)
     name = "Moss Farm"
     frame = prepare.GFX["farmframe"]
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOMM",
@@ -540,7 +562,8 @@ class MossFarm(Building):
                                                       self.size, tile_map, char_map)
         self.exit = (self.entrance[0] - 1, self.entrance[1])
         self.windows = [Window((self.rect.left + 9, self.rect.top + 18), (7, 7))]
-        self.growth = 1
+        self.growth = 0
+        self.current_growth = 0
         self.outputs["Moss"] = 0
         self.max_workers = 2
         
@@ -548,16 +571,19 @@ class MossFarm(Building):
         for window in self.windows:
             window.update(world)
         for worker in self.workers:
-            self.growth += 1  #TODO: should be from elf skill
-        if self.growth % 300 == 0:
+            self.growth += 1 *  worker.skills["Farming"]
+            self.current_growth += 1 *  worker.skills["Farming"]
+        if self.current_growth > 300:
+            self.current_growth -= 300
             for tile in self.tiles:
                 try:
                     tile.image = next(tile.images)
                 except AttributeError:
                     pass
         if self.growth > 1500:
-            self.outputs["Moss"] += 100    # TODO: should be from elf skill if growth isn't
-            self.growth = 1
+            self.outputs["Moss"] += 100
+            self.growth = 0
+            self.currrent_growth = 0
             
     def draw(self, surface):
         for window in self.windows:
@@ -572,6 +598,7 @@ class CarrotFarm(Building):
     size = (64, 80)
     name = "Carrot Farm"
     frame = prepare.GFX["farmframe"]
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOCC",
@@ -593,8 +620,8 @@ class CarrotFarm(Building):
         for window in self.windows:
             window.update(world)
         for worker in self.workers:
-            self.growth += 1  #TODO: should be from elf skill
-            self.current_growth += 1
+            self.growth += 1 * worker.skills["Farming"]
+            self.current_growth += 1 * worker.skills["Farming"]
         if self.current_growth > 300:
             self.current_growth -= 300
             for tile in self.tiles:
@@ -620,6 +647,7 @@ class BeetFarm(Building):
     size = (64, 80)
     name = "Beet Farm"
     frame = prepare.GFX["farmframe"]
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOBB",
@@ -641,8 +669,8 @@ class BeetFarm(Building):
         for window in self.windows:
             window.update(world)
         for worker in self.workers:
-            self.growth += 1  #TODO: should be from elf skill and use growth stages not modulo
-            self.current_growth += 1
+            self.growth += 1 * worker.skills["Farming"] #TODO: should be from elf skill and use growth stages not modulo
+            self.current_growth += 1 * worker.skills["Farming"]
         if self.current_growth > 300:
             self.current_growth -= 300
             for tile in self.tiles:
@@ -667,6 +695,7 @@ class WoodShed(Building):
     size = (32, 32)
     name = "Wood Shed"
     frame = prepare.GFX["farmframe"]
+    modes = None
     def __init__(self, index, world):
         tile_map = ["OX",
                           "WO"]
@@ -682,6 +711,7 @@ class Mine(Building):
     footprint = (2, 2)
     size = (32, 32)
     name = "Mine"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["OX",
                           "WO"]
@@ -694,7 +724,7 @@ class Mine(Building):
         
     def update(self, world):
         for worker in self.workers:
-            self.outputs["Iron"] += .005
+            self.outputs["Iron"] += .005 * worker.skills["Mining"]
 
             
 class Snowball(object):
@@ -765,6 +795,7 @@ class SnowForts(Building):
     footprint = (10, 3)
     size = (160, 48)
     name = "Snow Forts"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["OOOOOOOOOO",
                           "XOOOOOOOOO", 
@@ -808,6 +839,7 @@ class Theater(Building):
     footprint = (3, 3)
     size = (48, 64)
     name = "Theater"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XXX",
                           "OOO",
@@ -901,6 +933,7 @@ class SkatingRink(Building):
     footprint = (12, 5)
     size = (192, 80)
     name = "Skating Rink"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["OOOOOOOOOOOO",
                           "OOOOOOOOOOOO",
@@ -951,6 +984,7 @@ class SnackBar(Building):
     footprint = (4, 3)
     size = (64, 64)
     name = "Snack Bar"
+    modes = ["Cookies", "Carrot Cake"]
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOOO",
@@ -970,6 +1004,7 @@ class SnackBar(Building):
         self.patron_rects = []
         self.max_patrons = 12
         self.inputs["Milk"] = 1000  #Testing - should be 0
+        self.inputs["Carrot Cake"] = 0
         self.inputs["Cookies"] = 0
         world.food_buildings.append(self)
     
@@ -983,7 +1018,29 @@ class SnackBar(Building):
         elif len(self.patron_rects) > len(self.patrons):
             diff = len(self.patron_rects) - len(self.patrons)
             self.patron_rects = self.patron_rects[diff:]
-        
+        for patron in self.patrons:
+            milk = False
+            food_value = 0
+            cavities = 0
+            if self.inputs["Milk"]:
+                    self.inputs["Milk"] -= .01
+                    food_value += 1
+                    milk = True
+            if self.mode == "Cookies" and self.inputs["Cookies"] >= .01:
+                self.inputs["Cookies"] -= .01
+                food_value += 2
+                if milk:
+                    food_value += .5
+                cavities += .2
+            elif self.mode == "Carrot Cake" and self.inputs["Carrot Cake"] >= .01:    
+                self.inputs["Carrot Cake"] -= .01
+                food_value += 1.5
+                if milk:
+                    food_value += .4
+                cavities += .75
+                
+            patron.food += food_value
+            patron.cavities -= cavities
             
     def draw(self, surface):
         for tile in self.tiles:
@@ -998,6 +1055,7 @@ class CarrotStand(Building):
     footprint = (1, 1)
     size = (32, 48)
     name = "Carrot Stand"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XX",
                           "XX", 
@@ -1029,6 +1087,7 @@ class CottonCandyCart(Building):
     footprint = (1, 1)
     size = (32, 32)
     name = "Cotton Candy Cart"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XX", 
                           "CX"]

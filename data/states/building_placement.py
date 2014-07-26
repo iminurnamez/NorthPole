@@ -1,13 +1,20 @@
 from itertools import chain
 import pygame as pg
 from .. import tools, prepare
+from ..components.labels import Label
 
 class BuildingPlacement(tools._State):
-    def __init__(self):    
+    def __init__(self):
         super(BuildingPlacement, self).__init__()
         self.next = "MANAGING"
         self.index = (0, 0)
-        
+        screen = pg.display.get_surface().get_rect()
+        font = prepare.FONTS["weblysleekuili"]
+        self.instruct_label = Label(font, 14, "Left-click to place building", "gray1",
+                                               {"midtop": (screen.centerx, screen.top + 5)})
+        self.instruct_label2 = Label(font, 14, "Right-click to cancel", "gray1",
+                                               {"midtop": (screen.centerx, self.instruct_label.rect.bottom + 5)})
+
     def startup(self, persistent):
         self.persist = persistent
         self.player = persistent["player"]
@@ -19,13 +26,13 @@ class BuildingPlacement(tools._State):
     def update(self, surface, keys):
         mouse_pos = pg.mouse.get_pos()
         self.world.scroll(mouse_pos)
-        
+
         for cell in self.world.grid:
             if self.world.grid[cell].rect.collidepoint(mouse_pos):
                 self.index = cell
                 break
-        
-        self.tl_index = (self.index[0], self.index[1] - (int(self.build_size[1]/16)))      
+
+        self.tl_index = (self.index[0], self.index[1] - (int(self.build_size[1]/16)))
         self.placement_valid = True
         try:
             self.build_rect = pg.Rect((self.world.grid[self.tl_index].rect.left,
@@ -41,10 +48,10 @@ class BuildingPlacement(tools._State):
             self.placement_valid = False
         if any([e.rect.colliderect(self.collision_rect) for e in self.world.elves]):
             self.placement_valid = False
-        
-        
+
+
         self.draw(surface)
-    
+
     def get_event(self, event):
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
@@ -64,14 +71,15 @@ class BuildingPlacement(tools._State):
             else:
                 self.next = "MANAGING"
                 self.done = True
-                
-    def draw(self, surface):    
+
+    def draw(self, surface):
         surface.fill(pg.Color("white"))
         self.world.draw(surface)
-        
+
         place_color = (0, 255, 0, 50) if self.placement_valid else (255, 0, 0, 50)
         alpha_surf = pg.Surface(self.build_rect.size).convert_alpha()
         alpha_surf.fill(place_color)
-        surface.blit(alpha_surf, self.build_rect) 
-        
-        
+        surface.blit(alpha_surf, self.build_rect)
+        self.instruct_label.draw(surface)
+        self.instruct_label2.draw(surface)
+

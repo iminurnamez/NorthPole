@@ -1,6 +1,7 @@
 import random
 import pygame as pg
 import itertools as it
+from collections import OrderedDict
 from .. import prepare
 from . import elfnames
 
@@ -29,20 +30,27 @@ class Elf(object):
         self.cheer = self.max_cheer * .5
         self.food = self.max_food * .5
         self.cavities = self.max_cavities
-        self.strength = random.randint(50, 100)
-        #self.stats = {"Wits": , # + skill acquisition
-        #                   "Mirth": ,  #max_cheer
-        #                   "Stamina": , #max_energy
-        #                   "Strength": , #max_cargo
-        #                   "Charm": # + for reindeer handlers/donation army
-        #                   
-        #self.skills = {"Farming":
-        #                   "Woodworking":
-        #                   "Metalworking":
-        #                   "Stitchery":
-        #                   "Logging":
-        #                   "Mining":
-        #                   "Husbandry":
+        self.stats = {"Wits": .5, # + skill acquisition
+                           "Mirth": .5,  #max_cheer
+                           "Stamina": .5, #max_energy
+                           "Strength": .5, #max_cargo
+                           "Charm": .5}# + for reindeer handlers/donation army
+        
+                
+        self.skills = OrderedDict([("Farming", random.uniform(.25, .75)),
+                                              ("Logging", random.uniform(.25, .75)),
+                                              ("Mining", random.uniform(.25, .75)),
+                                              ("Hauling", random.uniform(.25, .75)),
+                                              ("Husbandry", random.uniform(.25, .75)),
+                                              ("Baking", random.uniform(.25, .75)),
+                                              ("Woodworking", random.uniform(.25, .75)),
+                                              ("Metalworking", random.uniform(.25, .75)),
+                                              ("Stitchery", random.uniform(.25, .75))])
+                           
+                           
+                          
+                            
+                             
         self.state = "Idle"
         self.speed = 1
         self.x_velocity = 0
@@ -211,9 +219,22 @@ class Elf(object):
             i += 1
         return reverse_route[::-1]
                 
-    def assign_job(self, building):
+    def assign_job(self, building, world):
         if self.job is not None:
             self.job.assigned.remove(self)
+            if self in self.job.workers:
+                self.job.workers.remove(self)
+            if self in self.job.en_route_workers:
+                self.job.en_route_workers.remove(self)
+            if self.venue:
+                if self in self.venue.workers:
+                    self.venue.workers.remove(self)
+                if self in self.venue.en_route_workers:
+                    self.venue.en_route_workers.remove(self)
+            if self.state in ("Working", "Hauling", "Logging"):
+                self.index = self.job.exit
+                self.rect.center = world.grid[self.index].rect.center
+                self.state = "Idle"
         self.job = building
         self.job.assigned.append(self)
         self.cargo = None
@@ -253,9 +274,17 @@ class Elf(object):
                 self.path = iter(self.find_path(world))
                 self.destination = next(self.path)
                                 
+        elif self.job.name == "Schoolhouse":
+            if self.work_check(world):
+                return
+            self.energy -= .5
+            self.food -= .5
+            self.cheer -= .6
+            
         elif self.job.name == "Warehouse":
             if self.work_check(world):
                 return
+            max_load = (self.stats["Strength"] + self.skills["Hauling"]) * 100
             if self.index == self.job.entrance:
                 big_stock = ("", 0)
                 stock_place = None
@@ -276,14 +305,14 @@ class Elf(object):
                         self.venue = stock_place
                         for thing in stock_place.inputs:
                             if stock_place.inputs[thing] < 500 and self.job.outputs[thing] > 0:
-                                amt = min(self.strength, self.job.outputs[thing],
+                                amt = min(max_load, self.job.outputs[thing],
                                                  1000 - stock_place.inputs[thing])
                                 self.job.outputs[thing] -= amt
                                 self.cargo = (thing, amt)
                                 break
                     else:
                         self.venue = need_place
-                        self.cargo = (big_need[0], min(self.strength,
+                        self.cargo = (big_need[0], min(max_load,
                                             self.job.outputs[big_need[0]], big_need[1]))
                     if self.cargo:
                         self.job.outputs[self.cargo[0]] -= self.cargo[1]
@@ -387,7 +416,7 @@ class Elf(object):
                 
         elif self.state == "Working":
             self.do_work(world)
-        
+            
         elif self.state == "Eating":
             if self.food >= self.max_food:
                 self.venue.patrons.remove(self)
@@ -395,25 +424,7 @@ class Elf(object):
                 self.state = "Idle"
                 self.index = self.venue.exit
                 self.rect.center = world.grid[self.index].rect.center             
-            else:
-                food_value = 0
-                cookies = False
-                milk = False
-                if self.venue.inputs["Cookies"]:
-                    self.venue.inputs["Cookies"] -= .01
-                    food_value += 2
-                    cookies = True
-                if self.venue.inputs["Milk"]:
-                    self.venue.inputs["Milk"] -= .01
-                    food_value += 1
-                    milk = True
-                if cookies and milk:
-                    food_value += 1
-                if not cookies or milk:
-                    food_value += .2
-                self.food += food_value
-                self.cavities -= .2
-        
+
         elif self.state == "Merrymaking":
             if self.cheer >= self.max_cheer:
                 self.venue.patrons.remove(self)
@@ -424,18 +435,20 @@ class Elf(object):
             else:
                 self.venue.give_cheer(self)
 
-                                
+      
         elif self.state == "Logging":
             if not world.ticks % 7:
                 self.image = next(self.images["Logging"])
-            self.cargo = ("Wood", self.cargo[1] + .01)
-            self.venue.wood -= .01
+            how_much_wood = .02 * self.skills["Logging"]
+            self.cargo = ("Wood", self.cargo[1] + how_much_wood)
+            self.venue.wood -= how_much_wood
             self.energy -= 1
             self.cheer -= 1
+            self.food -= 1
             if (self.energy < 200
                  or self.food < 150
                  or self.cheer < 100
-                 or self.cargo[1] > self.strength):
+                 or self.cargo[1] > self.stats["Strength"] * 100):
                 self.venue.workers.remove(self)
                 self.state = "Travelling"
                 self.next_state = "Working"
@@ -448,7 +461,8 @@ class Elf(object):
         elif self.state == "Hauling":
             self.energy -= 1
             self.cheer -= 1
-            
+            self.food -= 1
+            max_load = (self.stats["Strength"] + self.skills["Hauling"]) * 100
             if self.rect.topleft == world.grid[self.goal].rect.topleft:
                 self.index = self.goal
                 if self.index == self.job.entrance:
@@ -469,9 +483,9 @@ class Elf(object):
                             new_cargo = product
                             amount = self.venue.outputs[product]
                     if new_cargo:
-                        self.cargo = (new_cargo, min(self.strength,
+                        self.cargo = (new_cargo, min(max_load,
                                                                     self.venue.outputs[new_cargo]))                       
-                        self.venue.outputs[new_cargo] -= min(self.strength,
+                        self.venue.outputs[new_cargo] -= min(max_load,
                                                                                   self.venue.outputs[new_cargo])
                     self.venue = self.job
                     self.goal = self.venue.entrance
@@ -553,12 +567,14 @@ class Reindeer(object):
         
     def update(self, world):
         for worker in self.barn.workers:
+            husbandry = worker.skills["Husbandry"]
             if self.barn.inputs["Moss"] >= .01:
-                self.barn.outputs["Milk"] += .01
+                self.barn.outputs["Milk"] += .01 * husbandry
                 self.barn.inputs["Moss"] -= .01
             if self.barn.inputs["Carrot"] >= .005:
                 self.barn.inputs["Carrot"] -= .005
-                if not random.randint(0, 10000) and len(self.barn.reindeers) < 10:
+                if not (random.randint(0, int(25000 * (1 - husbandry))) 
+                           and len(self.barn.reindeers) < 10):
                     self.barn.reindeers.append(Reindeer(self.barn.rect.center,
                                                                           random.randint(1, 10),
                                                                           self.barn))               
@@ -571,6 +587,4 @@ class Reindeer(object):
         
         
     def draw(self, surface):
-        surface.blit(self.image, self.rect)    
-     
-        
+        surface.blit(self.image, self.rect)

@@ -1,6 +1,6 @@
 import pygame as pg
 from .. import tools, prepare
-from ..components import buildings, decorations, landing_strip, sawmill, nursery, dentist
+from ..components import buildings, decorations, landing_strip, sawmill, nursery, dentist, school
 from ..components.labels import Label, GroupLabel, Button, PayloadButton
 
 
@@ -29,7 +29,7 @@ class BuildingSelection(tools._State):
                              "Resource": [buildings.MossFarm, buildings.CarrotFarm,
                                                 buildings.BeetFarm, buildings.WoodShed, nursery.Nursery],
                              "Production": [buildings.Barn, buildings.Bakery, sawmill.Sawmill],
-                             "Utility": [buildings.Warehouse, landing_strip.LandingStrip, dentist.DentistOffice],
+                             "Utility": [buildings.Warehouse, landing_strip.LandingStrip, dentist.DentistOffice, school.School],
                              "Decorations": [decorations.Snowman, decorations.XmasTree,
                                                     decorations.WavySanta, decorations.PyroBox]}
         self.persist = persistent

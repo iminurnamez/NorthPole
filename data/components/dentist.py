@@ -6,6 +6,7 @@ class DentistOffice(Building):
     footprint = (4, 3)
     size = (64, 64)
     name = "Dentist's Office"
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XXXX",
                           "OOOO",

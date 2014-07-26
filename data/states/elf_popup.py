@@ -16,12 +16,12 @@ class ElfPopup(tools._State):
         a_label = Label(self.font, 16, "Assign", "gray1",
                                {"center": (0, 0)}, "white")
         self.assign_button = Button(self.popup.left + 50,
-                                                  self.popup.top + 300,
-                                                  80, 50, a_label)
+                                                  self.popup.top + 400,
+                                                  80, 30, a_label)
         done_label = Label(self.font, 18, "DONE", "gray1", 
                                      {"topleft": (0, 0)}, "white")
         self.done_button = Button(self.popup.centerx - 40,
-                                                self.popup.bottom - 60, 80, 50,
+                                                self.popup.bottom - 60, 80, 40,
                                                 done_label)
     
     def draw(self, surface):
@@ -38,13 +38,13 @@ class ElfPopup(tools._State):
         if event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:
                 if self.done_button.rect.collidepoint(event.pos):
-                    self.next = "MANAGING"
+                    self.next = self.persist["previous"]
                     self.done = True            
                 elif self.assign_button.rect.collidepoint(event.pos):
                     self.next = "ELFASSIGNMENT"
                     self.done = True
             elif event.button == 3:
-                self.next = "MANAGING"
+                self.next = self.persist["previous"]
                 self.done = True
                 
     def update(self, surface, keys):
@@ -63,41 +63,42 @@ class ElfPopup(tools._State):
                            "Mine": "Miner",
                            "Sawmill": "Miller",
                            "Nursery": "Arborist",
-                           "Dentist's Office": "Dentist"}
+                           "Dentist's Office": "Dentist",
+                           "Schoolhouse": "Student"}
         
         self.persist = persistent
         self.world = self.persist["world"]
         self.elf = self.persist["elf"]
-        
+        self.next = self.persist["previous"]
         
         
         
         elf = self.elf
         self.labels = []
-        name_label = GLabel(self.labels, self.font, 24, elf.name, "gray1", 
-                                        {"midtop": (self.popup.centerx, self.popup.top + 10)},
+        name_label = GLabel(self.labels, self.font, 20, elf.name, "gray1", 
+                                        {"midtop": (self.popup.centerx, self.popup.top + 5)},
                                         "white")
         
         if elf.job is None:
             job_name = "Unemployed"
         else:
             job_name = job_map[elf.job.name]
-        career_label = GLabel(self.labels, self.font, 18, job_name,
+        career_label = GLabel(self.labels, self.font, 16, job_name,
                                          "gray1", {"midtop": (self.popup.centerx,
-                                         name_label.rect.bottom + 5)}, "white")
+                                         name_label.rect.bottom + 2)}, "white")
         if elf.state in {"Travelling", "Hauling"}:
             activity = "{} to {}".format(elf.state, elf.venue.name)
         else:
             activity = "{}".format(elf.state)        
         activity_label = GLabel(self.labels, self.font, 14, activity, "gray1", {"midtop": 
-                                          (self.popup.centerx, career_label.rect.bottom + 5)},
+                                          (self.popup.centerx, career_label.rect.bottom + 3)},
                                           "white")
         elf_stats = [("Energy", elf.energy/float(elf.max_energy)),
                           ("Food", elf.food/float(elf.max_food)),
                           ("Cheer", elf.cheer/float(elf.max_cheer)),
                           ("Cavities", elf.cavities/float(elf.max_cavities))]   
         meter_left = self.popup.left + 100
-        meter_middle = activity_label.rect.bottom + 20
+        meter_middle = activity_label.rect.bottom + 10
         label_left = self.popup.left + 10
         self.meters = []
         for stat in elf_stats:
@@ -105,8 +106,14 @@ class ElfPopup(tools._State):
             self.meters.append(meter)
             stat_label = GLabel(self.labels, self.font, 14, stat[0], "gray1", 
                                          {"midleft": (label_left, meter_middle)}, "white")
-            meter_middle += 30
-        
-       
-    
-    
+            meter_middle += 20
+        skill_title = GLabel(self.labels, self.font, 20, "Skills", "gray1", {"midtop":
+                                      (self.popup.centerx, stat_label.rect.bottom + 10)},
+                                      "white")
+        meter_middle = skill_title.rect.bottom + 10
+        for skill in elf.skills:
+            meter = Meter((meter_left, meter_middle), 150, 10, elf.skills[skill])
+            self.meters.append(meter)
+            skill_label = GLabel(self.labels, self.font, 14, skill, "gray1",
+                                         {"midleft": (label_left, meter_middle)}, "white")
+            meter_middle += 20

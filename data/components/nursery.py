@@ -59,7 +59,7 @@ class Nursery(Building):
     size = (96, 112)
     footprint = (6, 6)
     name = "Nursery"
-
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XXXXXX",
                           "OXOXOX",

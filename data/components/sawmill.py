@@ -7,7 +7,7 @@ class Sawmill(Building):
     footprint = (7, 6)
     size = (128, 112)
     name = "Sawmill"
-    
+    modes = None
     def __init__(self, index, world):
         tile_map = ["XXXXXXXX",
                           "OOOOOOOX",

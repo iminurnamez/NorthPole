@@ -37,6 +37,7 @@ class LandingStrip(Building):
     footprint = (23, 11)
     size = (368, 176)
     name = "Landing Strip"
+    modes = ["Cargo Transport"] # upgrade to add Donation Army mode
     def __init__(self, index, world):
         tile_map =  ["XXXXXXXXXXXXXXXXXXXXXXX",
                           "OOOOOOXXXXXXXXXXXXXXXXX",

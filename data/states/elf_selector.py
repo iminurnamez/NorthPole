@@ -48,6 +48,7 @@ class ElfSelector(tools._State):
                         if elf.name_label.rect.collidepoint(event.pos):
                             self.next = "ELFPOPUP"
                             self.persist["elf"] = elf
+                            self.persist["previous"] = "ELFSELECTOR"
                             self.done = True
                             break
             elif event.button == 3:

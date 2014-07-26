@@ -142,6 +142,7 @@ class World(object):
         self.ticks += 1
         
     def draw(self, surface):
+        screen = pg.display.get_surface().get_rect()
         surface.fill(pg.Color("grey96"))
         surface.blit(self.background, self.grid[(0,0)].rect.topleft)
         
@@ -150,7 +151,7 @@ class World(object):
             elf.draw(surface)
         all_buildings = it.chain(self.buildings, self.ores, self.decorations)
         buildings = sorted(all_buildings, key=lambda x: x.rect.bottom)
-        for building in buildings:
+        for building in [x for x in buildings if x.rect.colliderect(screen)]:
             building.draw(surface)
         for sign in self.travel_signs:
             sign.draw(surface)

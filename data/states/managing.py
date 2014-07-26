@@ -2,8 +2,8 @@ import sys
 import random
 import pygame as pg
 from .. import tools, prepare
-from ..components import worlds, buildings, elves, decorations, transport_sleigh, landing_strip
-
+from ..components import worlds, buildings, elves, decorations, transport_sleigh, landing_strip, clock_icon
+from ..components.labels import Label
 
 class Managing(tools._State):
     def __init__(self):
@@ -13,6 +13,16 @@ class Managing(tools._State):
         self.fps = 20
         self.world = worlds.World(3200, 2016, 16, 16)
         self.cursor = prepare.GFX["canecursor"]
+        font = prepare.FONTS["weblysleekuili"]
+        screen = pg.display.get_surface().get_rect()
+        self.instruct_label = Label(font, 14, "Left-click to select an elf or building", "gray1",
+                                               {"midtop": (screen.centerx, screen.top + 5)})
+        self.instruct_label2 = Label(font, 14, "Right-click to open construction menu", "gray1",
+                                                 {"midtop": (screen.centerx, self.instruct_label.rect.bottom + 2)})        
+        self.clock_icon = clock_icon.ClockIcon((screen.right - 70, screen.top + 25))
+        
+        
+        
         
         
         # TEST VALUES
@@ -263,13 +273,6 @@ class Managing(tools._State):
             if event.key == pg.K_ESCAPE:
                 pg.quit()
                 sys.exit()
-            elif event.key == pg.K_DOWN:
-                if self.fps > 20:
-                    self.fps -= 10
-            elif event.key == pg.K_UP:
-                if self.fps < self.max_fps:
-                    self.fps += 10
-                    
             elif event.key == pg.K_p:
                 self.next = "PRESENTDROP"
                 self.done = True
@@ -277,6 +280,15 @@ class Managing(tools._State):
         elif event.type == pg.MOUSEBUTTONDOWN:
             #Testing - buildings should supersede elves
             if event.button == 1:
+                if self.clock_icon.plus_rect.collidepoint(event.pos):
+                    if self.fps < self.max_fps:
+                        self.fps += 10 
+                    return
+                if self.clock_icon.minus_rect.collidepoint(event.pos):
+                    if self.fps > 20:
+                        self.fps -= 10
+                    return
+                    
                 clicked_elves = []
                 for elf in [x for x in self.world.elves if x.state in {"Hauling",
                                                                                          "Travelling", "Idle"}]:
@@ -293,6 +305,7 @@ class Managing(tools._State):
                     else:
                         self.persist["elves"] = clicked_elves
                         self.next = "ELFSELECTOR"
+                        self.persist["previous"] = "MANAGING"
                         self.done = True
                         return
                 for ore in self.world.ores:
@@ -321,6 +334,8 @@ class Managing(tools._State):
                             self.persist["player"] = self.player
                             self.done = True
                         return
+                
+            
             elif event.button == 3:
                 self.next = "BUILDINGTYPESELECTION"
                 self.persist["player"] = self.player
@@ -336,8 +351,15 @@ class Managing(tools._State):
             pg.mixer.music.play(-1)
         
         self.world.update()            
+        self.clock_icon.update()
         
+        self.draw(surface, mouse_pos)
+        
+    def draw(self, surface, mouse_pos):    
         self.world.draw(surface)
+        self.instruct_label.draw(surface)
+        self.instruct_label2.draw(surface)
+        self.clock_icon.draw(surface)        
         surface.blit(self.cursor, (mouse_pos))
         
     def startup(self, persistent):
