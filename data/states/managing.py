@@ -20,7 +20,10 @@ class Managing(tools._State):
         self.instruct_label2 = Label(font, 14, "Right-click to open construction menu", "gray1",
                                                  {"midtop": (screen.centerx, self.instruct_label.rect.bottom + 2)})        
         self.clock_icon = clock_icon.ClockIcon((screen.right - 80, screen.top + 35))
+        self.help_icon = prepare.GFX["questionmark"]
+        self.help_rect = self.help_icon.get_rect(topleft=(35, 35))
         self.paused = False
+        self.persist["helping"] = False
         
         
         
@@ -292,6 +295,11 @@ class Managing(tools._State):
                     else:
                         self.paused = True
                     return
+                if self.help_rect.collidepoint(event.pos):
+                    self.next = "HELPMENU"
+                    self.done = True
+                    return
+                
                 deers = []
                 for barn in [x for x in self.world.buildings if x.name == "Barn"]:
                     deers.extend(barn.reindeers)
@@ -373,6 +381,7 @@ class Managing(tools._State):
         self.instruct_label.draw(surface)
         self.instruct_label2.draw(surface)
         self.clock_icon.draw(surface)        
+        surface.blit(self.help_icon, self.help_rect)
         surface.blit(self.cursor, (mouse_pos))
         
     def startup(self, persistent):

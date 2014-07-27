@@ -15,6 +15,7 @@ class IntroSplash(tools._State):
         screen = pg.display.get_surface().get_rect()
         self.sleigh = transport_sleigh.TransportSleigh((screen.right + 10, 200), None)
         self.persist["player"] = self.player
+        self.persist["helping"] = False
         pg.mouse.set_visible(False)
         
     def get_event(self, event):

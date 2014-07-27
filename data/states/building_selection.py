@@ -7,7 +7,7 @@ from ..components.labels import Label, GroupLabel, Button, PayloadButton
 class BuildingSelection(tools._State):
     def __init__(self):
         super(BuildingSelection, self).__init__()
-        self.cursor = prepare.GFX["hammercursor"] #["canecursor"]
+        self.cursor = prepare.GFX["hammercursor"]
         self.next = "BUILDINGPLACEMENT"
         self.font = prepare.FONTS["weblysleekuil"]
         screen_rect = pg.display.get_surface().get_rect()
@@ -35,7 +35,10 @@ class BuildingSelection(tools._State):
         self.persist = persistent
         self.build_type = persistent["building type"]
         self.world = self.persist["world"]
-        
+        if self.persist["helping"]:
+            self.cursor = prepare.GFX["questionmark"]
+        else:
+            self.cursor = prepare.GFX["hammercursor"]
         self.buttons = []
         top = self.title.rect.bottom + 30
         for build in build_map[self.build_type]:
@@ -48,16 +51,23 @@ class BuildingSelection(tools._State):
     
     def get_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
-            if self.back.rect.collidepoint:
+            if event.button == 1:
+                if self.back.rect.collidepoint:
+                    self.next = "BUILDINGTYPESELECTION"
+                    self.done = True
+                for button in self.buttons:
+                    if button.rect.collidepoint(event.pos):
+                        self.persist["building type"] = button.payload
+                        if self.persist["helping"]:
+                            self.next = "BUILDINGHELP"
+                        else:
+                            self.next = "BUILDINGPLACEMENT"
+                        self.done = True
+                        break
+            elif event.button == 3:
                 self.next = "BUILDINGTYPESELECTION"
                 self.done = True
-            for button in self.buttons:
-                if button.rect.collidepoint(event.pos):
-                    self.persist["building type"] = button.payload
-                    self.next = "BUILDINGPLACEMENT"
-                    self.done = True
-                    break
-                    
+                
     def update(self, surface, keys):
         self.draw(surface)
         

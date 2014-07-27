@@ -39,6 +39,10 @@ class BuildingTypeSelection(tools._State):
     def startup(self, persistent):
         pg.mouse.set_visible(False)
         self.persist = persistent
+        if self.persist["helping"]:
+            self.cursor = prepare.GFX["questionmark"]
+        else:
+            self.cursor = prepare.GFX["hammercursor"]
        
         
     def draw(self, surface):
@@ -61,7 +65,10 @@ class BuildingTypeSelection(tools._State):
         elif event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:
                 if self.back_button.rect.collidepoint(event.pos):
-                    self.next = "MANAGING"
+                    if self.persist["helping"]:
+                        self.next  = "HELPMENU"
+                    else:
+                        self.next = "MANAGING"
                     self.done = True
                 else:
                     for button in self.buttons:
@@ -71,6 +78,9 @@ class BuildingTypeSelection(tools._State):
                             self.done = True 
                             break                        
             elif event.button == 3:
-                self.next = "MANAGING"
+                if self.persist["helping"]:
+                    self.next = "HELPMENU"
+                else:
+                    self.next = "MANAGING"
                 self.done = True                
                     
