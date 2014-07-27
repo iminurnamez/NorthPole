@@ -27,11 +27,7 @@ class ElfAssignment(tools._State):
                 for build in [x for x in self.world.buildings if x.name != "Tree"]:
                     if build.rect.collidepoint(event.pos):
                         if build.max_workers > 0:
-                            self.elf.assign_job(build, self.world)
-                            #self.persist["message"] = "{} has been assigned to {}".format(self.elf.name, self.elf.job.name)
-                            #self.persist["previous"] = "MANAGING"
-                            #self.next = "MESSAGEWINDOW"
-                            
+                            self.elf.assign_job(build, self.world)                            
                             self.done = True
                             break
             elif event.button == 3:
@@ -40,7 +36,7 @@ class ElfAssignment(tools._State):
                 
     def update(self, surface, keys):
         # map scrolling
-        self.world.scroll(pg.mouse.get_pos())        
+        self.world.scroll(pg.mouse.get_pos())
         self.draw(surface)
         
     def draw(self, surface):

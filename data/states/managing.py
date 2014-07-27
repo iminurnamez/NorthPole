@@ -19,8 +19,8 @@ class Managing(tools._State):
                                                {"midtop": (screen.centerx, screen.top + 5)})
         self.instruct_label2 = Label(font, 14, "Right-click to open construction menu", "gray1",
                                                  {"midtop": (screen.centerx, self.instruct_label.rect.bottom + 2)})        
-        self.clock_icon = clock_icon.ClockIcon((screen.right - 70, screen.top + 25))
-        
+        self.clock_icon = clock_icon.ClockIcon((screen.right - 80, screen.top + 35))
+        self.paused = False
         
         
         
@@ -281,14 +281,26 @@ class Managing(tools._State):
             #Testing - buildings should supersede elves
             if event.button == 1:
                 if self.clock_icon.plus_rect.collidepoint(event.pos):
-                    if self.fps < self.max_fps:
-                        self.fps += 10 
+                    if self.paused:
+                        self.paused = False
+                    elif self.fps < self.max_fps:
+                        self.fps += 20
                     return
                 if self.clock_icon.minus_rect.collidepoint(event.pos):
                     if self.fps > 20:
-                        self.fps -= 10
+                        self.fps -= 20
+                    else:
+                        self.paused = True
                     return
-                    
+                deers = []
+                for barn in [x for x in self.world.buildings if x.name == "Barn"]:
+                    deers.extend(barn.reindeers)
+                for deer in deers:
+                    if deer.rect.collidepoint(event.pos):
+                        self.persist["deer"] = deer
+                        self.next = "DEERPOPUP"
+                        self.done = True                        
+                        return
                 clicked_elves = []
                 for elf in [x for x in self.world.elves if x.state in {"Hauling",
                                                                                          "Travelling", "Idle"}]:
@@ -350,8 +362,9 @@ class Managing(tools._State):
             pg.mixer.music.load(prepare.MUSIC["song1"])
             pg.mixer.music.play(-1)
         
-        self.world.update()            
-        self.clock_icon.update()
+        if not self.paused:
+            self.world.update()            
+            self.clock_icon.update()
         
         self.draw(surface, mouse_pos)
         

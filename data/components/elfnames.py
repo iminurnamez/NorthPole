@@ -44,7 +44,9 @@ REINDEER = ["Sprinkle", "Sparkle", "Twinkle", "Merry", "Chestnut",
                      "Sugarplum", "Jingle", "Mittens", "Nippy", "Tinsel", "Popcorn",
                      "Snowflake", "Snowball", "Candy", "Stockings", "Strudel",
                      "Muffin", "Pinecone", "Perry", "Cole", "Dean", "Pudding",
-                     "Figgy", "Wishbone", "Pumpkin", "Percy"]
+                     "Figgy", "Wishbone", "Pumpkin", "Percy", "Nat", "Ives",
+                     "Gumdrop", "Candycane", "Peppermint", "Walnut", "Chestnut",
+                     "Lollipop", "Bubblegum", "Buttons", "Gizmo"]
                      
 RACE = ["Escape Claus", "Jingle Jangle", "Old St. Quick", "Stalking Stuffer",
              "Santa Baby", "Tweedly Dee", "Frosty Knows", "Chet's Nuts",
@@ -59,5 +61,5 @@ RACE = ["Escape Claus", "Jingle Jangle", "Old St. Quick", "Stalking Stuffer",
              "Cup of Cheer", "So Delightful", "Pa Run Pa Pun Pun",
              "Much Mistletoeing", "So Verdant", "Sentimental Feeling",
              "__Donder__", "Blitzin' Vixen", "Naughty Listed", "All Year Angel",
-             "Awful Good Girl", "Lord-a-Leaping", "Conspiring Dreamer"]
+             "Awful Good Girl", "Lord-a-Leaping", "Conspiring Dreamer", "Dr. Toboggan"]
              

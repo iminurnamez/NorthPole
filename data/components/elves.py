@@ -510,7 +510,8 @@ class Elf(object):
                 if self.next_state in ["Working", "Logging"]:
                     if self not in self.venue.workers:
                         self.venue.workers.append(self)
-                    self.venue.en_route_workers.remove(self)
+                    if self in self.venue.en_route_workers:
+                        self.venue.en_route_workers.remove(self)
                 else:
                     self.venue.patrons.append(self)
                     try:
@@ -538,7 +539,7 @@ class Elf(object):
 class Reindeer(object):
     velocities = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1),
                        (1, -1), (1, 0), (1, 1)]
-    def __init__(self, center, speed, barn):
+    def __init__(self, center, speed, stamina, barn):
         self.name = random.choice(elfnames.REINDEER)
         self.velocity = random.choice(self.velocities)
         self.images = {(-1, -1): it.cycle([prepare.GFX["leftreindeer1"],
@@ -559,6 +560,7 @@ class Reindeer(object):
         self.image = next(self.images[self.velocity])
         self.rect = self.image.get_rect(center=center)
         self.speed = speed
+        self.stamina = stamina
         self.barn = barn
         
     def move(self, offset):
@@ -573,10 +575,24 @@ class Reindeer(object):
                 self.barn.inputs["Moss"] -= .01
             if self.barn.inputs["Carrot"] >= .005:
                 self.barn.inputs["Carrot"] -= .005
-                if not random.randint(0, int(25000 * (1 - husbandry))) and len(self.barn.reindeers) < 10:
-                    self.barn.reindeers.append(Reindeer(self.barn.rect.center,
-                                                                          random.randint(1, 10),
-                                                                          self.barn))               
+                if not random.randint(0, int(40000 * (1 - husbandry))) and len(self.barn.reindeers) < 10:
+                    if len(self.barn.reindeers) > 1:
+                        mate = random.choice([x for x in self.barn.reindeers if x is not self])                        
+                        new_speed = self.speed * random.uniform(.9, 1.1)
+                        if random.choice((0, 1)):
+                            new_speed += mate.speed * random.uniform(.9, 1.1)
+                        else:
+                            new_speed += self.speed * random.uniform(.9, 1.1)
+                        new_speed = int(new_speed / 2.0)    
+                        new_stamina = self.stamina * random.uniform(.9, 1.1)
+                        if random.choice((0, 1)):
+                            new_stamina += mate.stamina * random.uniform(.9, 1.1)
+                        else:
+                            new_stamina += self.stamina * random.uniform(.9, 1.1)
+                        new_stamina = int(new_stamina / 2.0)
+                        self.barn.reindeers.append(Reindeer(self.barn.rect.center, new_speed,
+                                                                              new_stamina, self.barn))
+                                                                              
         if not random.randint(0, 10):
             self.velocity = random.choice(self.velocities)
             self.image = next(self.images[self.velocity])

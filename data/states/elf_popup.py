@@ -52,7 +52,6 @@ class ElfPopup(tools._State):
         
     def startup(self, persistent):
         pg.mouse.set_visible(False)
-        self.next = "MANAGING" #persistent["previous"]
         job_map = {"Warehouse": "Hauler",
                            "Moss Farm": "Moss Farmer",
                            "Carrot Farm": "Carrot Farmer",

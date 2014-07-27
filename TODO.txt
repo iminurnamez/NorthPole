@@ -1,11 +1,8 @@
 
-Production modes for buildings - arrow buttons to cycle through modes on building popup
-
-Elf skills - add skills, change job production to skill-based - add skills to elf popup
 
 Union Hall - new elves will be assigned here
 
-Union relations - determines frequency of new elves: -(idle elves) +(avg elf food)
+Union relations - determines frequency of new elves: -(idle elves) +(avg elf mood) +(num students)
 
 Add quality? Better food quality increases happiness score, etc. instead of just faster meter filling 
 
@@ -25,5 +22,4 @@ Resource costs for construction
 
 Upgrades for buildings
 
-#Click on elf in building popup to open elf popup
 

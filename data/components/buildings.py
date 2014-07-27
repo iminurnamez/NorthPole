@@ -466,8 +466,8 @@ class Barn(Building):
         self.open_rect = self.door_image.get_rect(topleft=(self.rect.left + 38, self.rect.top + 41))
         self.shut_rect = self.door_image.get_rect(topleft=(self.rect.left + 49, self.rect.top + 41))
         self.deer_rect = pg.Rect(self.rect.left + 1, self.rect.top + 45 , 109, 65) 
-        self.reindeers = [Reindeer(self.rect.center, random.randint(1, 10), self),
-                                 Reindeer(self.rect.center, random.randint(1, 10), self)]
+        self.reindeers = [Reindeer(self.rect.center, random.randint(20, 99), random.randint(20, 99), self),
+                                 Reindeer(self.rect.center, random.randint(20, 99), random.randint(20, 99), self)]
         self.outputs["Milk"] = 0
         self.inputs["Moss"] = 0
         self.inputs["Carrot"] = 0

@@ -12,6 +12,7 @@ from .states import betting, deerracing, raceresults
 from .states import elf_popup, building_popup, instructionsplash, bet_instructions
 from .states import building_placement, golfing, building_type_selection, building_selection
 from .states import elf_assignment, message_window, elf_selector, mine_construction, present_drop
+from .states import deerpopup, deer_assignment
 
 
 def main():
@@ -37,6 +38,9 @@ def main():
                          "DEERRACING": deerracing.DeerRacing(),
                          "RACINGRESULTS": raceresults.RaceResults(),
                          "GOLFING": golfing.Golfing(),
-                         "PRESENTDROP": present_drop.PresentDrop()}
+                         "PRESENTDROP": present_drop.PresentDrop(),
+                         "DEERPOPUP": deerpopup.DeerPopup(),
+                         "DEERASSIGNMENT": deer_assignment.DeerAssignment()}
+                         
     run_it.setup_states(state_dict, "INTROSPLASH")
     run_it.main()
