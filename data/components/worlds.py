@@ -25,6 +25,12 @@ class Cell(object):
         grid = world.grid
         return [x for x in opens if x in grid and 
                     not grid[x].occupied]
+
+
+class Scroller(pg.Rect):
+    def __init__(self, left, top, width, height, offset):
+        super(Scroller, self).__init__(left, top, width, height)
+        self.offset = offset
         
 class World(object):
     def __init__(self, width, height, tile_width, tile_height):
@@ -86,18 +92,30 @@ class World(object):
                     tree = Tree(_index, self)
                     break
 
-        
-        
         self.rest_buildings = []
         self.cheer_buildings = []
         self.food_buildings = []
         self.dental_buildings = []
         self.decorations = []
-        
         self.elves = []
         
         self.ticks = 1
         self.scroll_speed = 3
+        
+
+        
+        screen = pg.display.get_surface().get_rect()
+        margin = 25
+        corner = 100
+        self.scrollers = [Scroller(corner, 0, screen.w - (corner * 2),
+                                            margin, (0, self.scroll_speed)),
+                                Scroller(corner, screen.h - margin,
+                                            screen.w - (corner * 2), margin,
+                                            (0, -self.scroll_speed)),
+                                Scroller(0, corner, margin, screen.h - (corner * 2),
+                                            (self.scroll_speed, 0)),
+                                Scroller(screen.w - margin, corner, margin,
+                                            screen.h - (corner * 2), (-self.scroll_speed, 0))]
         
     def move(self, offset):
         for cell in self.grid:
@@ -112,26 +130,22 @@ class World(object):
             ore.move(offset)
             
     def scroll(self, mouse_pos):  
-        screen = pg.display.get_surface().get_rect()
-        scroll_margin = 25
-        offsetx = 0
-        offsety = 0
-        mousex, mousey = mouse_pos
-        extreme_left = self.grid[(0, 0)].rect.left
-        extreme_right = self.grid[(self.tiles_wide - 1, 0)].rect.right
-        extreme_top = self.grid[(0, 0)].rect.top
-        extreme_bottom = self.grid[(0, self.tiles_high - 1)].rect.bottom
-        if mousex < scroll_margin and  extreme_left < self.scroll_speed:
-            offsetx = self.scroll_speed
-        elif mousex > screen.right - scroll_margin and extreme_right > screen.right - self.scroll_speed :
-            offsetx = -self.scroll_speed
-        if mousey < scroll_margin and extreme_top < self.scroll_speed:
-            offsety = self.scroll_speed
-        elif mousey > screen.bottom - scroll_margin and extreme_bottom > screen.bottom - self.scroll_speed: 
-            offsety = -self.scroll_speed
-        if offsetx or offsety:
-            self.move((offsetx, offsety))
-            
+        collisions = [x for x in self.scrollers if x.collidepoint(mouse_pos)]
+        if collisions:
+            screen = pg.display.get_surface().get_rect()
+            edge_ok = {(0, self.scroll_speed): (self.grid[(0, 0)].rect.top < self.scroll_speed),
+                              (0, -self.scroll_speed): (self.grid[(0, self.tiles_high - 1)].rect.bottom 
+                                                              > screen.bottom - self.scroll_speed),
+                              (self.scroll_speed, 0): (self.grid[(0, 0)].rect.left < self.scroll_speed),
+                              (-self.scroll_speed, 0): (self.grid[(self.tiles_wide - 1, 0)].rect.right
+                                                              > screen.right - self.scroll_speed)}
+            for scroller in collisions:
+                if edge_ok[scroller.offset]:
+                    self.move(scroller.offset)
+        
+
+
+       
     def update(self):
         for elf in self.elves:
             elf.update(self)
@@ -150,8 +164,9 @@ class World(object):
         for elf in self.elves:
             elf.draw(surface)
         all_buildings = it.chain(self.buildings, self.ores, self.decorations)
-        buildings = sorted(all_buildings, key=lambda x: x.rect.bottom)
-        for building in [x for x in buildings if x.rect.colliderect(screen)]:
+        buildings = [x for x in all_buildings if x.rect.colliderect(screen)]
+
+        for building in sorted(buildings, key=lambda x: x.rect.bottom):
             building.draw(surface)
         for sign in self.travel_signs:
             sign.draw(surface)

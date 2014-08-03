@@ -12,23 +12,22 @@ class MineConstruction(tools._State):
         center = pg.display.get_surface().get_rect().center
         self.window = pg.Rect(0, 0, 400, 500)
         self.window.center = center
-        self.font = prepare.FONTS["weblysleekuil"]
-        self.title = Label(self.font, 16, "Ore Deposit", "darkgreen",
+        font = prepare.FONTS["weblysleekuil"]
+        self.title = Label(font, 16, "Ore Deposit", "darkgreen",
                                  {"midtop": (self.window.centerx, self.window.top + 10)},
                                  "white")
-        build = Label(self.font, 16, "Build Mine", "darkgreen", {"topleft": (0, 0)},
+        build = Label(font, 16, "Build Mine", "darkgreen", {"topleft": (0, 0)},
                                      "white")
         self.build_button = Button(self.window.centerx - 60,
                                                 self.title.rect.bottom + 20, 120, 50,
                                                 build)                             
-        done_label = Label(self.font, 18, "DONE", "darkgreen", {"topleft": (0, 0)},
+        done_label = Label(font, 18, "DONE", "darkgreen", {"topleft": (0, 0)},
                                      "white")
         self.done_button = Button(self.window.centerx - 40,
                                                 self.window.bottom - 60, 80, 50,
                                                 done_label) 
         
     def startup(self, persistent):
-        pg.mouse.set_visible(False)
         self.next = "MANAGING"
         self.persist = persistent
         self.world = self.persist["world"]
@@ -47,7 +46,7 @@ class MineConstruction(tools._State):
             elif event.button == 3:
                 self.done = True
 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         self.draw(surface)
     
     def draw(self, surface):

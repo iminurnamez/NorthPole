@@ -26,7 +26,7 @@ class DeerRacing(tools._State):
         self.done = False
         return tools._State.cleanup(self)
     
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         if self.race.done:
             self.gallop_sound.stop()
             self.done = True

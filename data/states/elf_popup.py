@@ -47,11 +47,10 @@ class ElfPopup(tools._State):
                 self.next = self.persist["previous"]
                 self.done = True
                 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         self.draw(surface)    
         
     def startup(self, persistent):
-        pg.mouse.set_visible(False)
         job_map = {"Warehouse": "Hauler",
                            "Moss Farm": "Moss Farmer",
                            "Carrot Farm": "Carrot Farmer",

@@ -22,7 +22,6 @@ class ElfSelector(tools._State):
         self.cursor = prepare.GFX["canecursor"]
                                                 
     def startup(self, persistent):
-        pg.mouse.set_visible(False)
         self.persist = persistent
         self.world = self.persist["world"]
         # only first ten elves
@@ -55,7 +54,7 @@ class ElfSelector(tools._State):
                 self.done = True
                 self.next = "MANAGING"
                 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         self.draw(surface)
         
     def draw(self, surface):

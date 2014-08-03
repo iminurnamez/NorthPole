@@ -11,9 +11,7 @@ class MessageWindow(tools._State):
         self.window = pg.Rect(0, 0, 300, 100)
         self.window.center = screen_rect.center
     
-    def startup(self, persistent):
-        pg.mouse.set_visible(False)
-        
+    def startup(self, persistent): 
         self.persist = persistent
         self.next = self.persist["previous"]
         self.world = self.persist["world"]
@@ -42,7 +40,7 @@ class MessageWindow(tools._State):
             elif event.button == 3:
                 self.done = True
                 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         self.draw(surface)
         
     def draw(self, surface):

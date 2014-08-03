@@ -24,6 +24,7 @@ class Control(object):
         self.state_name = None
         self.state = None
         self.fullscreen = False
+        self.dt = 0.0
 
     def setup_states(self, state_dict, start_state):
         """Given a dictionary of States and a State to start in,
@@ -40,7 +41,7 @@ class Control(object):
             self.done = True
         elif self.state.done:
             self.flip_state()
-        self.state.update(self.screen, self.keys)
+        self.state.update(self.screen, self.keys, self.dt)
 
 
     def flip_state(self):
@@ -84,7 +85,7 @@ class Control(object):
     def main(self):
         """Main loop for entire program."""
         while not self.done:
-            self.clock.tick(self.state.fps)
+            self.dt = self.clock.tick(self.state.fps)
             self.event_loop()
             self.update()
             pg.display.update()

@@ -23,7 +23,7 @@ class BuildingPlacement(tools._State):
         self.footprint = self.building_type.footprint
         self.build_size = self.building_type.size
 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         mouse_pos = pg.mouse.get_pos()
         self.world.scroll(mouse_pos)
 

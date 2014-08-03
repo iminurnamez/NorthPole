@@ -14,11 +14,7 @@ class BettingSplash(tools._State):
     def get_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
             self.done = True
-            
-    def startup(self, persistent):
-        self.persist = persistent
-        pg.mouse.set_visible(False)
         
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         surface.blit(self.image, self.image_rect)
         surface.blit(self.cursor, pg.mouse.get_pos())

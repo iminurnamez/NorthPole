@@ -58,7 +58,7 @@ class BuildingPopup(tools._State):
                     self.next = "MANAGING"
                 self.done = True
                 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         if self.persist["building"].modes:
             self.mode_label = Label(self.font, 18, self.persist["building"].mode, "gray1",
                                                 {"midtop": (self.popup.centerx,
@@ -70,7 +70,7 @@ class BuildingPopup(tools._State):
         self.draw(surface)    
         
     def startup(self, persistent):
-        pg.mouse.set_visible(False)
+
         self.persist = persistent
         self.player = persistent["player"]
         self.world = persistent["world"]

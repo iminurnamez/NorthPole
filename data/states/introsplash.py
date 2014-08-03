@@ -6,7 +6,7 @@ from ..components import transport_sleigh
 class IntroSplash(tools._State):
     def __init__(self):
         super(IntroSplash, self).__init__()
-        self.next = "INSTRUCTIONSPLASH"
+        self.next = "MANAGING"
         self.player = prepare.PLAYER
         self.image = prepare.GFX["title"]
         center_point = pg.display.get_surface().get_rect().center
@@ -22,7 +22,7 @@ class IntroSplash(tools._State):
         if event.type == pg.MOUSEBUTTONDOWN:
             self.done = True
             
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         surface.blit(self.image, self.image_rect)
         self.sleigh.rect.move_ip(-1, 0)
         self.sleigh.draw(surface)

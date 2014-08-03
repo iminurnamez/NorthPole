@@ -85,4 +85,12 @@ class Meter(object):
         pg.draw.rect(surface, self.color, self.bar)
         pg.draw.rect(surface, pg.Color("gray40"), self.frame, 2)
 
-        
+class Menu(object):
+    def __init__(self, size):
+        center = pg.display.get_surface().get_rect().center
+        self.rect = pg.Rect((0, 0), size)
+        self.rect.center = center
+
+    def draw(self, surface):
+        pg.draw.rect(surface, pg.Color("white"), self.rect)
+        pg.draw.rect(surface, pg.Color("maroon"), self.rect, 3)        

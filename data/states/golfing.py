@@ -85,7 +85,7 @@ class Golfing(tools._State):
         fade_num = GLabel(self.labels, self.font, 10, str(converts[disc.name][3]), "gray1", {"topright": (self.disc_ui_rect.left + 80, fade.rect.top)}, "white")
         self.disc_path = prepare.GFX[disc.name.lower()]
         
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         if keys[pg.K_LEFT]:
             self.golfer.angle += 1
         elif keys[pg.K_RIGHT]:

@@ -20,7 +20,6 @@ class BuildingSelection(tools._State):
         self.back = Button(self.window.centerx - 50, self.window.bottom - 90, 120, 70, b_label)
     
     def startup(self, persistent):
-        pg.mouse.set_visible(False)
         build_map = {"Rest": [buildings.Igloo, buildings.House, buildings.GingerbreadHouse],
                              "Merrymaking": [buildings.Theater, buildings.SnowForts,
                                                       buildings.SkatingRink],
@@ -68,7 +67,7 @@ class BuildingSelection(tools._State):
                 self.next = "BUILDINGTYPESELECTION"
                 self.done = True
                 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         self.draw(surface)
         
     def draw(self, surface):

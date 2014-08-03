@@ -13,7 +13,6 @@ class DeerAssignment(tools._State):
         self.persist = persistent
         self.deer = self.persist["deer"]
         self.world = self.persist["world"]
-        pg.mouse.set_visible(False)
         screen = pg.display.get_surface().get_rect()
         self.cursors = cycle([prepare.GFX["leftreindeer1"], prepare.GFX["leftreindeer2"]])
         self.cursor = next(self.cursors)
@@ -40,7 +39,7 @@ class DeerAssignment(tools._State):
             elif event.button == 3:
                 self.done = True
                 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         self.ticks += 1
         if not self.ticks % 8:
             self.cursor = next(self.cursors)

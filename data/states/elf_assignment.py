@@ -16,7 +16,6 @@ class ElfAssignment(tools._State):
                                                                   self.instruct_label.rect.bottom + 5)})                                      
     
     def startup(self, persistent):
-        pg.mouse.set_visible(False)
         self.world = persistent["world"]
         self.elf = persistent["elf"]
         self.persist = persistent
@@ -34,7 +33,7 @@ class ElfAssignment(tools._State):
                 self.next = "MANAGING"
                 self.done = True
                 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         # map scrolling
         self.world.scroll(pg.mouse.get_pos())
         self.draw(surface)

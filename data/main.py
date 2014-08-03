@@ -9,10 +9,10 @@ and in the prepare module.
 from . import prepare,tools
 from .states import introsplash, managing, boarding, mountainguide
 from .states import betting, deerracing, raceresults
-from .states import elf_popup, building_popup, instructionsplash, bet_instructions
+from .states import elf_popup, building_popup, bet_instructions
 from .states import building_placement, golfing, building_type_selection, building_selection
 from .states import elf_assignment, message_window, elf_selector, mine_construction, present_drop
-from .states import deerpopup, deer_assignment, helpmenu
+from .states import deerpopup, deer_assignment, helpmenus, infohelp
 
 
 def main():
@@ -20,7 +20,6 @@ def main():
     
     run_it = tools.Control(prepare.ORIGINAL_CAPTION)
     state_dict = {"INTROSPLASH": introsplash.IntroSplash(),
-                         "INSTRUCTIONSPLASH": instructionsplash.InstructionSplash(),
                          "MANAGING": managing.Managing(),
                          "ELFSELECTOR": elf_selector.ElfSelector(),
                          "ELFPOPUP": elf_popup.ElfPopup(),
@@ -41,7 +40,16 @@ def main():
                          "PRESENTDROP": present_drop.PresentDrop(),
                          "DEERPOPUP": deerpopup.DeerPopup(),
                          "DEERASSIGNMENT": deer_assignment.DeerAssignment(),
-                         "HELPMENU": helpmenu.HelpMenu()}
+                         "HELPMENU": helpmenus.HelpMenu(),
+                         "ELFHELP": helpmenus.ElfHelp(),
+                         "SKILLSHELP": infohelp.SkillsHelp(),
+                         "NEEDSHELP": infohelp.NeedsHelp(),
+                         "QUALITIESHELP": infohelp.QualitiesHelp(),
+                         "ITEMSHELP": helpmenus.ItemsHelp(),
+                         "RESOURCESHELP": infohelp.ResourcesHelp(),
+                         "GOODSHELP": infohelp.GoodsHelp(),
+                         "TOYSHELP": infohelp.ToysHelp(),
+                         "CONTROLSHELP": infohelp.ControlsHelp()}
                          
     run_it.setup_states(state_dict, "INTROSPLASH")
     run_it.main()

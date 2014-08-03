@@ -21,19 +21,17 @@ class Boarding(tools._State):
         self.course = course.Course(prepare.COURSES["mtkringle"])    
         self.boarder = boarder.Boarder(
                               (pg.display.get_surface().get_width() / 2, 0))
-        self.player = persistant["player"] 
-        pg.mouse.set_visible(False)
+        self.player = persistant["player"]
         return tools._State.startup(self, persistant)
         
     def cleanup(self):
         if self.next != "BOARDING":
             pg.mixer.music.fadeout(1500)
-            pg.mouse.set_visible(True)
         self.persist["player"] = self.player
         self.done = False
         return tools._State.cleanup(self)
         
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         if not pg.mixer.music.get_busy():
             song = choice([prepare.MUSIC["heist_boogie"],
                                    prepare.MUSIC["tiajuana"]])

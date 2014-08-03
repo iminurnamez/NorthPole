@@ -17,17 +17,16 @@ class MountainGuide(tools._State):
         if event.type == pg.KEYDOWN:
             self.done = True
             
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         surface.fill(pg.Color("white"))
         surface.blit(self.image, self.image_rect)
         surface.blit(self.cursor, pg.mouse.get_pos())
         
-    def startup(self, persistant):
-        pg.mouse.set_visible(False)
+    def startup(self, persistent):
         pg.mixer.music.fadeout(1500)
         self.__init__()
         self.player = persistant["player"] 
-        return tools._State.startup(self, persistant)
+        return tools._State.startup(self, persistent)
         
     def cleanup(self):
         self.persist["player"] = self.player

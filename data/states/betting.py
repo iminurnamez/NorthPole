@@ -227,9 +227,12 @@ class Betting(tools._State):
                     self.current_wager = ""
                     self.current_deers = []
             if self.start_button.rect.collidepoint(event.pos):
+                self.persist["racers"] = self.racers
+                self.persist["distance"] = self.distance
+                self.persist["player"] = self.player
                 self.done = True
 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         self.dynamics = []
         
         self.bet_type_label = GLabel(self.dynamics, self.font, 16,
@@ -288,15 +291,7 @@ class Betting(tools._State):
             racer.stats_label.draw(surface)
         surface.blit(self.cursor, pg.mouse.get_pos())
 
-    def startup(self, persistant):
-        pg.mouse.set_visible(False)
+    def startup(self, persistent):
         self.__init__()
         self.player = persistant["player"]
-        return tools._State.startup(self, persistant)    
-
-    def cleanup(self):
-        self.persist["racers"] = self.racers
-        self.persist["distance"] = self.distance
-        self.persist["player"] = self.player
-        self.done = False
-        return self.persist
+        return tools._State.startup(self, persistent)    

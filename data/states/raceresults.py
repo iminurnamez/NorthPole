@@ -49,7 +49,6 @@ class RaceResults(tools._State):
                                          button_width, button_height, quit_label)
         
     def startup(self, persistant):
-        pg.mouse.set_visible(False)
         self.player = persistant["player"] 
         self.setup(persistant["results"])
         return tools._State.startup(self, persistant)
@@ -68,7 +67,7 @@ class RaceResults(tools._State):
                 self.next = "MANAGING"
                 self.done = True
                 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         surface.fill(pg.Color("white"))
         for result in self.results:
             result.name_label.draw(surface)

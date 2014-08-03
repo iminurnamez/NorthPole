@@ -65,7 +65,7 @@ class DeerPopup(tools._State):
                 self.next = "MANAGING"
                 self.done = True
                 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         self.draw(surface)
     
     def draw(self, surface):

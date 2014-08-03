@@ -77,7 +77,7 @@ class PresentDrop(tools._State):
             gift.move(offset)
         
 
-    def update(self, surface, keys):
+    def update(self, surface, keys, dt):
         self.time_elapsed += 1/float(self.fps)
         if len(self.stars) < 50:
             self.stars.append(Star((self.screen_rect.right + 3,
